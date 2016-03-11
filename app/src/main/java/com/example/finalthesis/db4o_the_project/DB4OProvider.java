@@ -39,16 +39,16 @@ public class DB4OProvider extends Db4oHelper {
     }
 
     class GetReflectClasses extends AsyncTask<Void, Void, Void> {
-        List<ReflectClass> reflectClasses = null;
-        ProgressDialog mProgressDialog;
+                List<ReflectClass> reflectClasses = null;
+                ProgressDialog mProgressDialog;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = new ProgressDialog(context);
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setTitle("Loading data");
-            mProgressDialog.setMessage("Loading...");
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mProgressDialog = new ProgressDialog(context);
+                    mProgressDialog.setIndeterminate(true);
+                    mProgressDialog.setTitle("Loading data");
+                    mProgressDialog.setMessage("Loading...");
             mProgressDialog.show();
         }
 
