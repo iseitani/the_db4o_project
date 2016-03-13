@@ -1,6 +1,7 @@
 package com.example.finalthesis.db4o_the_project;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.db4o.ObjectContainer;
@@ -34,9 +36,10 @@ public class Initial extends AppCompatActivity
     private String username=null;
     private String password=null;
     */
-    private  NavigationView navigationView;
+    private Menu menu;
+    private String kClass = null;
     private List<ReflectClass> knownClasses;
-    private int location=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +62,19 @@ public class Initial extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        menu = navigationView.getMenu();
+        Class2Text();
         navigationView.setNavigationItemSelectedListener(this);
+        Button proceedToQuery=(Button)findViewById(R.id.proceedToQuery);
+        proceedToQuery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent x=new Intent(this,ActivityCharitakis.class);
+                x.putExtra("className",kClass);
+                startActivity(x);
+            }
+        });
     }
 
     @Override
@@ -95,59 +108,53 @@ public class Initial extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-     private void Class2Text(){
-         List<String> temp=new ArrayList<String>();
-         int io=0;
-         for(ReflectClass r : knownClasses){
-             temp.add(knownClasses.get(io++).getName());
-         }
-     }
+
+    private void Class2Text() {
+        List<String> temp = new ArrayList<String>();
+        int io = 0;
+        for (int ko = 0; ko < knownClasses.size(); ko++) {
+            menu.add(knownClasses.get(ko).getName());
+        }
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
+        kClass=item.getTitle().toString();
+        Button proceedToQuery=(Button)findViewById(R.id.proceedToQuery);
+        proceedToQuery.setClickable(true);
+         new LoadObjectsATTTask().execute();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    private class LoadObjectsATTTask extends AsyncTask<Integer , String,  String > {
+
+
+    private class LoadObjectsATTTask extends AsyncTask<Integer, String, String> {
         List<String> reflectATTListSTRING;
         ProgressDialog mProgressDialog;
-        protected String  doInBackground(Integer... params) {
-            reflectATTListSTRING=new ArrayList<String>() ;
-           // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db  = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
-            ReflectClass rf1=knownClasses.get(location);
-                ReflectClass rfi=rf1.getDelegate();
-                ReflectField[] fields = rfi.getDeclaredFields();
-                for(ReflectField rff:fields){
-                    if(rff.getFieldType().isCollection()){
-                        reflectATTListSTRING.add(rff.getName() + "-->" +" isCollection");
-                    }
-                    else{
-                        reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
-                    }
+
+        protected String doInBackground(Integer... params) {
+            reflectATTListSTRING = new ArrayList<String>();
+            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
+            ReflectClass rf1 = db.ext().knownClasses().getClass//edw bale  parameter string kClass
+            ReflectClass rfi = rf1.getDelegate();
+            ReflectField[] fields = rfi.getDeclaredFields();
+            for (ReflectField rff : fields) {
+                if (rff.getFieldType().isCollection()) {
+                    reflectATTListSTRING.add(rff.getName() + "-->" + " isCollection");
+                } else {
+                    reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
                 }
+            }
 
             return null;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -157,29 +164,30 @@ public class Initial extends AppCompatActivity
             mProgressDialog.setMessage("Searching for the required Fields");
             mProgressDialog.show();
         }
+
         protected void onProgressUpdate(Integer... progress) {
 
         }
 
         @Override
         protected void onPostExecute(String t) {
-            ListView ATTListView=(ListView)findViewById(R.id.ATTListView);
-            ATTListView.setAdapter(new ArrayAdapter<String>(getApplication().getBaseContext(), android.R.layout.simple_list_item_activated_1,
-                    android.R.id.text1, reflectATTListSTRING));
             mProgressDialog.dismiss();
         }
     }
-    private class LoadClassATTTask extends AsyncTask<Integer , String,  String > {
+
+    private class LoadClassATTTask extends AsyncTask<Integer, String, String> {
         List<String> reflectATTListSTRING;
         ProgressDialog mProgressDialog;
         ReflectClass[] sdmkd = null;
-        protected String  doInBackground(Integer... params) {
-            reflectATTListSTRING=new ArrayList<String>() ;
+
+        protected String doInBackground(Integer... params) {
+            reflectATTListSTRING = new ArrayList<String>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db  = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
             sdmkd = db.ext().reflector().knownClasses();
             return null;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -189,6 +197,7 @@ public class Initial extends AppCompatActivity
             mProgressDialog.setMessage("Searching for Classes");
             mProgressDialog.show();
         }
+
         protected void onProgressUpdate(Integer... progress) {
 
         }
@@ -196,11 +205,12 @@ public class Initial extends AppCompatActivity
         @Override
         protected void onPostExecute(String t) {
             List<String> itemList = new ArrayList<String>();
-            for (int i = 0; i < sdmkd.length/2; i++) {
+            for (int i = 0; i < sdmkd.length / 2; i++) {
                 if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
                     knownClasses.add(sdmkd[i]);
                 }
-            mProgressDialog.dismiss();
+                mProgressDialog.dismiss();
+            }
         }
     }
 }
