@@ -1,5 +1,7 @@
 package com.example.finalthesis.db4o_the_project;
 
+import android.content.Context;
+
 import com.db4o.ObjectContainer;
 import com.db4o.reflect.ReflectClass;
 
@@ -10,13 +12,10 @@ import java.util.List;
  * Created by ILIAS on 11/3/2016.
  */
 
-
-
-
-public class ClassHelp {
+public class ClassHelp extends Db4oHelper {
     private ObjectContainer db = null;
     private List<ReflectClass> lik;
-    public ClassHelp(ObjectContainer db) {
+    public ClassHelp(Context cnxt) {
         this.db = db;
         lik=new ArrayList<ReflectClass>();
     }
