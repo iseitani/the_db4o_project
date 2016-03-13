@@ -47,34 +47,28 @@ public class Initial extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.proceedToQuery);
+        fab.setClickable(false);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent x = new Intent(Initial.this, ConstraintsActivity.class);
+                x.putExtra("className", kClass);
+                startActivity(x);
             }
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         menu = navigationView.getMenu();
-        Class2Text();
+        knownClasses = new ArrayList<>();
+        new LoadClassATTTask().execute();
         navigationView.setNavigationItemSelectedListener(this);
-        Button proceedToQuery=(Button)findViewById(R.id.proceedToQuery);
-        proceedToQuery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent x=new Intent(this,ActivityCharitakis.class);
-                x.putExtra("className",kClass);
-                startActivity(x);
-            }
-        });
     }
 
     @Override
@@ -122,10 +116,10 @@ public class Initial extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
 
-        kClass=item.getTitle().toString();
-        Button proceedToQuery=(Button)findViewById(R.id.proceedToQuery);
+        kClass = item.getTitle().toString();
+        FloatingActionButton proceedToQuery = (FloatingActionButton) findViewById(R.id.proceedToQuery);
         proceedToQuery.setClickable(true);
-         new LoadObjectsATTTask().execute();
+        new LoadObjectsATTTask().execute();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -140,8 +134,8 @@ public class Initial extends AppCompatActivity
         protected String doInBackground(Integer... params) {
             reflectATTListSTRING = new ArrayList<String>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
-            ReflectClass rf1 = db.ext().knownClasses().getClass//edw bale  parameter string kClass
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
+            ReflectClass rf1 = db.ext().reflector().forName(kClass);
             ReflectClass rfi = rf1.getDelegate();
             ReflectField[] fields = rfi.getDeclaredFields();
             for (ReflectField rff : fields) {
@@ -158,7 +152,7 @@ public class Initial extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getApplication().getBaseContext());
+            mProgressDialog = new ProgressDialog(Initial.this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setTitle("Loading Fields ");
             mProgressDialog.setMessage("Searching for the required Fields");
@@ -171,6 +165,7 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
+            // TODO: Edo malon prepei na emfanizeis ta ReflectFields
             mProgressDialog.dismiss();
         }
     }
@@ -183,7 +178,7 @@ public class Initial extends AppCompatActivity
         protected String doInBackground(Integer... params) {
             reflectATTListSTRING = new ArrayList<String>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.5", 4000, "olympic", "olympic");
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
             sdmkd = db.ext().reflector().knownClasses();
             return null;
         }
@@ -191,7 +186,7 @@ public class Initial extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getApplication().getBaseContext());
+            mProgressDialog = new ProgressDialog(Initial.this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setTitle("Loading Clases ");
             mProgressDialog.setMessage("Searching for Classes");
@@ -209,8 +204,9 @@ public class Initial extends AppCompatActivity
                 if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
                     knownClasses.add(sdmkd[i]);
                 }
-                mProgressDialog.dismiss();
             }
+            Class2Text();
+            mProgressDialog.dismiss();
         }
     }
 }
