@@ -109,6 +109,7 @@ public class Initial extends AppCompatActivity
         for (int ko = 0; ko < knownClasses.size(); ko++) {
             menu.add(knownClasses.get(ko).getName());
         }
+        onNavigationItemSelected(menu.getItem(0));
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
