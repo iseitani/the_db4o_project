@@ -15,6 +15,7 @@ import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsRecyclerViewAdapter;
+import com.example.finalthesis.db4o_the_project.fragments.ConstraintDialogFragment;
 import com.example.finalthesis.db4o_the_project.views.DividerItemDecoration;
 
 import java.util.Arrays;
@@ -54,12 +55,19 @@ public class ConstraintsActivity extends AppCompatActivity {
     }
 
     private void showReflectFields(List<ReflectField> reflectFields) {
-        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, null);
+        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemClickedListener() {
+            @Override
+            public void onListItemLongClicked(ReflectField reflectField) {
+                //new ConstraintDialog(ConstraintsActivity.this, reflectField.getName()).show();
+                ConstraintDialogFragment constraintDialogFragment = new ConstraintDialogFragment(reflectField);
+                constraintDialogFragment.show(getSupportFragmentManager(), "constraintDialog");
+            }
+        });
         reflectFieldsRecyclerView.setAdapter(reflectFieldsRecyclerViewAdapter);
     }
 
     public interface OnListItemClickedListener {
-        void onListItemClicked(ReflectField reflectField);
+        void onListItemLongClicked(ReflectField reflectField);
     }
 
     class GetReflectFields extends AsyncTask<String, Void, Void> {

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Spinner
+        android:id="@+id/operatorSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/text_margin"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceListItem">
+
+    </Spinner>
+
+    <EditText
+        android:id="@+id/valueEditText"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/operatorSpinner"
+        android:layout_height="50dp"
+        android:layout_margin="@dimen/text_margin"
+        android:inputType="text"
+        android:hint="Value"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+
+    <Spinner
+        android:id="@+id/valueSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="@dimen/text_margin"
+        android:layout_below="@+id/operatorSpinner"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:visibility="invisible">
+
+
+    </Spinner>
+
+</RelativeLayout>

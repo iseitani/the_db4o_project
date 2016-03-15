@@ -62,7 +62,7 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemClicked(holder.mItem);
+                    mListener.onListItemLongClicked(holder.mItem);
                 }
                 return true;
             }
