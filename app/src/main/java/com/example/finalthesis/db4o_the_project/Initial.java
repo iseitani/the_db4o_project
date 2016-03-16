@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,13 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
+import android.view.View;
 
 import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
-import com.db4o.ext.StoredClass;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 
@@ -118,6 +113,7 @@ public class Initial extends AppCompatActivity
         // Handle navigation view item clicks here.
 
         kClass = item.getTitle().toString();
+        setTitle(kClass);
         FloatingActionButton proceedToQuery = (FloatingActionButton) findViewById(R.id.proceedToQuery);
         proceedToQuery.setClickable(true);
         new LoadObjectsATTTask().execute();
@@ -135,6 +131,7 @@ public class Initial extends AppCompatActivity
         protected String doInBackground(Integer... params) {
             reflectATTListSTRING = new ArrayList<String>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
+            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
             ReflectClass rf1 = db.ext().reflector().forName(kClass);
             ReflectClass rfi = rf1.getDelegate();
@@ -146,6 +143,7 @@ public class Initial extends AppCompatActivity
                     reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
                 }
             }
+            db.close();
 
             return null;
         }
@@ -179,8 +177,10 @@ public class Initial extends AppCompatActivity
         protected String doInBackground(Integer... params) {
             reflectATTListSTRING = new ArrayList<String>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
+            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
             sdmkd = db.ext().reflector().knownClasses();
+            db.close();
             return null;
         }
 

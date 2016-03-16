@@ -21,7 +21,6 @@
         android:layout_below="@+id/operatorSpinner"
         android:layout_height="50dp"
         android:layout_margin="@dimen/text_margin"
-        android:inputType="text"
         android:hint="Value"
         android:textAppearance="?attr/textAppearanceListItem" />
 

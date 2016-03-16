@@ -3,14 +3,17 @@ package com.example.finalthesis.db4o_the_project;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
+import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectField;
@@ -25,6 +28,7 @@ public class ConstraintsActivity extends AppCompatActivity {
 
     RecyclerView reflectFieldsRecyclerView;
     ReflectFieldsRecyclerViewAdapter reflectFieldsRecyclerViewAdapter;
+    String reflectClassName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +41,10 @@ public class ConstraintsActivity extends AppCompatActivity {
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 
-        String reflectClassName = getIntent().getExtras().getString("className");
+        reflectClassName = getIntent().getExtras().getString("className");
         if (reflectClassName != null) {
             new GetReflectFields().execute(reflectClassName);
+            setTitle(reflectClassName);
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -58,9 +63,13 @@ public class ConstraintsActivity extends AppCompatActivity {
         reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemClickedListener() {
             @Override
             public void onListItemLongClicked(ReflectField reflectField) {
-                //new ConstraintDialog(ConstraintsActivity.this, reflectField.getName()).show();
-                ConstraintDialogFragment constraintDialogFragment = new ConstraintDialogFragment(reflectField);
-                constraintDialogFragment.show(getSupportFragmentManager(), "constraintDialog");
+                if (reflectField.getFieldType().isCollection()) {
+                    Log.i("MyConstraintsActivity", "field type: " + reflectField.getFieldType().toString());
+                } else {
+                    ConstraintDialogFragment constraintDialogFragment = ConstraintDialogFragment.newInstance(reflectField.getName(),
+                            reflectField.getFieldType().getName(), reflectClassName, null);
+                    constraintDialogFragment.show(getSupportFragmentManager(), "constraintDialog");
+                }
             }
         });
         reflectFieldsRecyclerView.setAdapter(reflectFieldsRecyclerViewAdapter);
@@ -88,8 +97,10 @@ public class ConstraintsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... params) {
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
+            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
             reflectFields = Arrays.asList(db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields());
+            db.close();
             return null;
         }
 
