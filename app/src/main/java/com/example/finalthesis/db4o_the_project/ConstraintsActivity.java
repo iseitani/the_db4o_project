@@ -1,23 +1,19 @@
 package com.example.finalthesis.db4o_the_project;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
@@ -35,6 +31,7 @@ public class ConstraintsActivity extends AppCompatActivity {
     private RecyclerView reflectFieldsRecyclerView;
     private ReflectFieldsRecyclerViewAdapter reflectFieldsRecyclerViewAdapter;
     private String reflectClassName;
+    private String classPath;
     private List<String> userClasses;
 
     @Override
@@ -49,10 +46,17 @@ public class ConstraintsActivity extends AppCompatActivity {
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 
-        reflectClassName = getIntent().getExtras().getString("className");
-        if (reflectClassName != null) {
+
+        classPath = getIntent().getExtras().getString("className");
+        if (classPath != null) {
+            String[] classes = classPath.split("\\.");
+            if (classes.length > 0) {
+                reflectClassName = classes[classes.length - 1];
+            } else {
+                reflectClassName = classPath;
+            }
             new GetReflectFields().execute(reflectClassName);
-            setTitle(reflectClassName);
+            setTitle(classPath);
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -83,14 +87,22 @@ public class ConstraintsActivity extends AppCompatActivity {
     private void showReflectFields(List<ReflectField> reflectFields) {
         reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemClickedListener() {
             @Override
-            public void onListItemLongClicked(ReflectField reflectField) {
+            public void onListItemLongClicked(final ReflectField reflectField) {
                 if (reflectField.getFieldType().isCollection() || reflectField.getFieldType().isArray()) {
                     Toast.makeText(ConstraintsActivity.this, "Constraints in collections and arrays are not supported", Toast.LENGTH_LONG).show();
                 } else if (userClasses.contains(reflectField.getFieldType().getName())) {
-                    startActivity(new Intent(ConstraintsActivity.this, ConstraintsActivity.class).putExtra("className", reflectField.getFieldType().getName()));
+                    startActivity(new Intent(ConstraintsActivity.this, ConstraintsActivity.class)
+                            .putExtra("className", classPath + "." + reflectField.getFieldType().getName()));
                 } else {
                     ConstraintDialogFragment constraintDialogFragment = ConstraintDialogFragment.newInstance(reflectField.getName(),
-                            reflectField.getFieldType().getName(), reflectClassName, null);
+                            reflectField.getFieldType().getName(), reflectClassName, new ConstraintDialogFragment.OnSaveButtonClickedListener() {
+                                @Override
+                                public void onSaveButtonClicked() {
+                                    reflectFieldsRecyclerViewAdapter.setHasConstraint(reflectField, true);
+                                    reflectFieldsRecyclerViewAdapter.notifyDataSetChanged();
+                                    Toast.makeText(ConstraintsActivity.this, "Constraint added at field " + reflectField.getName(), Toast.LENGTH_LONG).show();
+                                }
+                            });
                     constraintDialogFragment.show(getSupportFragmentManager(), "constraintDialog");
                 }
             }

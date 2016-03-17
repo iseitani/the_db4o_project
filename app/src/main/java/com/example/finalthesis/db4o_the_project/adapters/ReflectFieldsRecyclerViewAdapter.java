@@ -1,5 +1,6 @@
 package com.example.finalthesis.db4o_the_project.adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +20,14 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
 
     private final List<ReflectField> mValues;
     private boolean[] checkBoxArray;
+    private boolean[] hasConstraint;
     private final ConstraintsActivity.OnListItemClickedListener mListener;
 
     public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, ConstraintsActivity.OnListItemClickedListener listener) {
         mValues = items;
         mListener = listener;
         checkBoxArray = new boolean[mValues.size()];
+        hasConstraint = new boolean[mValues.size()];
     }
 
     @Override
@@ -67,6 +70,11 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
                 return true;
             }
         });
+        if (hasConstraint[position]) {
+            holder.mView.setBackgroundColor(Color.YELLOW);
+        } else {
+            holder.mView.setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     @Override
@@ -82,6 +90,10 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
             }
         }
         return selectedReflectFields;
+    }
+
+    public void setHasConstraint(ReflectField reflectField, boolean hasConstraint) {
+        this.hasConstraint[mValues.indexOf(reflectField)] = hasConstraint;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

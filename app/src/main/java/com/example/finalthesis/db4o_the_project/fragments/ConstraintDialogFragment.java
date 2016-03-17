@@ -5,15 +5,19 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -34,10 +38,12 @@ public class ConstraintDialogFragment extends DialogFragment {
     private String reflectFieldName;
     private String reflectFieldType;
     private String reflectClassName;
-    private Spinner valueSpinner;
+    private Spinner valueSpinner, operatorSpinner;
     private EditText valueEditText;
+    private TextInputLayout valueTextInputLayout;
     private boolean isBoolean = false;
     private static OnSaveButtonClickedListener mOnSaveButtonClickedListener;
+    private AlertDialog mAlertDialog;
 
     private String[] fieldValues;
 
@@ -113,9 +119,40 @@ public class ConstraintDialogFragment extends DialogFragment {
                 })
                 .setView(view);
 
-        Spinner operatorSpinner = (Spinner) view.findViewById(R.id.operatorSpinner);
+        operatorSpinner = (Spinner) view.findViewById(R.id.operatorSpinner);
         valueSpinner = (Spinner) view.findViewById(R.id.valueSpinner);
         valueEditText = (EditText) view.findViewById(R.id.valueEditText);
+        valueTextInputLayout = (TextInputLayout) view.findViewById(R.id.valueTextInputLayout);
+
+        valueEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                shouldPositiveButtonEnabled();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        valueSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                shouldPositiveButtonEnabled();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         ArrayAdapter adapter;
         switch (reflectFieldType) {
             case "java.lang.String":
@@ -141,12 +178,11 @@ public class ConstraintDialogFragment extends DialogFragment {
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         operatorSpinner.setAdapter(adapter);
-
         operatorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (parent.getItemAtPosition(position).toString().equals("=")) {
-                    valueEditText.setVisibility(View.INVISIBLE);
+                    valueTextInputLayout.setVisibility(View.INVISIBLE);
                     valueSpinner.setVisibility(View.VISIBLE);
                     if (isBoolean) {
                         ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{"true", "false"});
@@ -162,9 +198,10 @@ public class ConstraintDialogFragment extends DialogFragment {
                         }
                     }
                 } else {
-                    valueEditText.setVisibility(View.VISIBLE);
+                    valueTextInputLayout.setVisibility(View.VISIBLE);
                     valueSpinner.setVisibility(View.INVISIBLE);
                 }
+                shouldPositiveButtonEnabled();
             }
 
             @Override
@@ -174,7 +211,27 @@ public class ConstraintDialogFragment extends DialogFragment {
         });
 
         // Create the AlertDialog object and return it
-        return builder.create();
+        mAlertDialog = builder.create();
+        return mAlertDialog;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+    }
+
+    private void shouldPositiveButtonEnabled() {
+        if (mAlertDialog != null) {
+            Button positiveButton = mAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (((valueEditText.getText().length() > 0 && valueTextInputLayout.getVisibility() == View.VISIBLE) ||
+                    (valueSpinner.getSelectedItem() != null && !valueSpinner.getSelectedItem().toString().equals("Loading....") && valueSpinner.getVisibility() == View.VISIBLE)) &&
+                    operatorSpinner.getSelectedItemPosition() != 0) {
+                positiveButton.setEnabled(true);
+            } else {
+                positiveButton.setEnabled(false);
+            }
+        }
     }
 
     @Override
