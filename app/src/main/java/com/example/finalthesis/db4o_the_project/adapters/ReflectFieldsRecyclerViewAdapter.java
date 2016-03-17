@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.ConstraintsActivity;
 import com.example.finalthesis.db4o_the_project.R;
+import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,20 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
     private boolean[] hasConstraint;
     private final ConstraintsActivity.OnListItemClickedListener mListener;
 
-    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, ConstraintsActivity.OnListItemClickedListener listener) {
+    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, List<MyConstraint> myConstraints, ConstraintsActivity.OnListItemClickedListener listener) {
         mValues = items;
         mListener = listener;
         checkBoxArray = new boolean[mValues.size()];
         hasConstraint = new boolean[mValues.size()];
+        for (ReflectField reflectField : mValues) {
+            String reflectFieldName = reflectField.getName();
+            for (MyConstraint myConstraint : myConstraints) {
+                List<String> path = myConstraint.getPath();
+                if (path.contains(reflectFieldName) && myConstraint.getReflectFieldType().equals(reflectField.getFieldType().getName())) {
+                    setHasConstraint(reflectField, true);
+                }
+            }
+        }
     }
 
     @Override
