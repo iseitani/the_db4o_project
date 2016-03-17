@@ -39,6 +39,8 @@ public class ConstraintDialogFragment extends DialogFragment {
     private boolean isBoolean = false;
     private static OnSaveButtonClickedListener mOnSaveButtonClickedListener;
 
+    private String[] fieldValues;
+
     private static final String[] numbersOperators = new String[4];
 
     static {
@@ -94,7 +96,7 @@ public class ConstraintDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_constraint, ((ViewGroup)getView()));
+        View view = inflater.inflate(R.layout.dialog_constraint, ((ViewGroup) getView()));
         builder.setTitle("Constraint for field: " + reflectFieldName)
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -151,7 +153,13 @@ public class ConstraintDialogFragment extends DialogFragment {
                         valueSpinner.setAdapter(adapter);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     } else {
-                        new LoadFieldValues().execute();
+                        if (fieldValues == null) {
+                            new LoadFieldValues().execute();
+                        } else {
+                            ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, fieldValues);
+                            valueSpinner.setAdapter(adapter);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        }
                     }
                 } else {
                     valueEditText.setVisibility(View.VISIBLE);
@@ -176,7 +184,6 @@ public class ConstraintDialogFragment extends DialogFragment {
     }
 
     private class LoadFieldValues extends AsyncTask<Void, Void, Void> {
-        String[] fieldValues;
 
         @Override
         protected void onPreExecute() {

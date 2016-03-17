@@ -1,6 +1,8 @@
 package com.example.finalthesis.db4o_the_project;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,24 +13,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
+import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.fragments.ConstraintDialogFragment;
 import com.example.finalthesis.db4o_the_project.views.DividerItemDecoration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ConstraintsActivity extends AppCompatActivity {
 
-    RecyclerView reflectFieldsRecyclerView;
-    ReflectFieldsRecyclerViewAdapter reflectFieldsRecyclerViewAdapter;
-    String reflectClassName;
+    private RecyclerView reflectFieldsRecyclerView;
+    private ReflectFieldsRecyclerViewAdapter reflectFieldsRecyclerViewAdapter;
+    private String reflectClassName;
+    private List<String> userClasses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +44,7 @@ public class ConstraintsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        userClasses = new ArrayList<>();
         reflectFieldsRecyclerView = (RecyclerView) findViewById(R.id.reflectFieldsRecyclerView);
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -59,12 +67,27 @@ public class ConstraintsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            if (!super.onOptionsItemSelected(item)) {
+                //NavUtils.navigateUpFromSameTask(this);
+                onBackPressed();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void showReflectFields(List<ReflectField> reflectFields) {
         reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemClickedListener() {
             @Override
             public void onListItemLongClicked(ReflectField reflectField) {
-                if (reflectField.getFieldType().isCollection()) {
-                    Log.i("MyConstraintsActivity", "field type: " + reflectField.getFieldType().toString());
+                if (reflectField.getFieldType().isCollection() || reflectField.getFieldType().isArray()) {
+                    Toast.makeText(ConstraintsActivity.this, "Constraints in collections and arrays are not supported", Toast.LENGTH_LONG).show();
+                } else if (userClasses.contains(reflectField.getFieldType().getName())) {
+                    startActivity(new Intent(ConstraintsActivity.this, ConstraintsActivity.class).putExtra("className", reflectField.getFieldType().getName()));
                 } else {
                     ConstraintDialogFragment constraintDialogFragment = ConstraintDialogFragment.newInstance(reflectField.getName(),
                             reflectField.getFieldType().getName(), reflectClassName, null);
@@ -100,6 +123,12 @@ public class ConstraintsActivity extends AppCompatActivity {
             //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
             reflectFields = Arrays.asList(db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields());
+            ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
+            for (ReflectClass reflectClass : reflectClasses) {
+                if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
+                    userClasses.add(reflectClass.getName());
+                }
+            }
             db.close();
             return null;
         }

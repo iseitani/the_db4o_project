@@ -8,29 +8,35 @@
         android:id="@+id/operatorSpinner"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:gravity="center"
         android:layout_margin="@dimen/text_margin"
+        android:gravity="center"
         android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceListItem">
 
     </Spinner>
 
-    <EditText
-        android:id="@+id/valueEditText"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_email"
         android:layout_width="match_parent"
-        android:layout_below="@+id/operatorSpinner"
-        android:layout_height="50dp"
-        android:layout_margin="@dimen/text_margin"
-        android:hint="Value"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/operatorSpinner">
+
+        <EditText
+            android:id="@+id/valueEditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="@dimen/text_margin"
+            android:hint="Value"
+            android:textAppearance="?attr/textAppearanceListItem" />
+    </android.support.design.widget.TextInputLayout>
 
 
     <Spinner
         android:id="@+id/valueSpinner"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_margin="@dimen/text_margin"
         android:layout_below="@+id/operatorSpinner"
+        android:layout_margin="@dimen/text_margin"
         android:gravity="center"
         android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceListItem"
