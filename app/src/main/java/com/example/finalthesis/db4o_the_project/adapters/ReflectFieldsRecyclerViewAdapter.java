@@ -22,22 +22,13 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
     private final List<ReflectField> mValues;
     private boolean[] checkBoxArray;
     private boolean[] hasConstraint;
-    private final ConstraintsActivity.OnListItemClickedListener mListener;
+    private final ConstraintsActivity.OnListItemLongClickedListener mListener;
 
-    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, List<MyConstraint> myConstraints, ConstraintsActivity.OnListItemClickedListener listener) {
+    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, ConstraintsActivity.OnListItemLongClickedListener listener) {
         mValues = items;
         mListener = listener;
         checkBoxArray = new boolean[mValues.size()];
         hasConstraint = new boolean[mValues.size()];
-        for (ReflectField reflectField : mValues) {
-            String reflectFieldName = reflectField.getName();
-            for (MyConstraint myConstraint : myConstraints) {
-                List<String> path = myConstraint.getPath();
-                if (path.contains(reflectFieldName) && myConstraint.getReflectFieldType().equals(reflectField.getFieldType().getName())) {
-                    setHasConstraint(reflectField, true);
-                }
-            }
-        }
     }
 
     @Override
@@ -48,8 +39,8 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        ReflectField reflectField = mValues.get(position);
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final ReflectField reflectField = mValues.get(position);
         holder.mItem = reflectField;
         String textToShow;
         if (reflectField.getFieldType().isCollection()) {
@@ -75,7 +66,7 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemLongClicked(holder.mItem);
+                    mListener.onListItemLongClicked(reflectField);
                 }
                 return true;
             }

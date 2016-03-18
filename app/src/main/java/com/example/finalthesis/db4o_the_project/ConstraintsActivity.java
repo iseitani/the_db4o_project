@@ -59,17 +59,16 @@ public class ConstraintsActivity extends AppCompatActivity {
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 
-
-        classPath = getIntent().getExtras().getString("className");
-        if (classPath != null) {
-            String[] classes = classPath.split("\\.");
-            if (classes.length > 0) {
-                reflectClassName = classes[classes.length - 1];
-            } else {
-                reflectClassName = classPath;
-            }
+        reflectClassName = getIntent().getExtras().getString("className");
+        if (reflectClassName != null) {
             new GetReflectFields().execute(reflectClassName);
-            setTitle(classPath);
+        }
+
+        classPath = getIntent().getExtras().getString("classPath");
+        if (classPath != null) {
+            setTitle(classPath + " (" + reflectClassName + ")");
+        } else {
+            setTitle(reflectClassName);
         }
 
         String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
@@ -128,7 +127,7 @@ public class ConstraintsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
-                String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
+                String jsonData = data.getExtras().getString("ConstraintsJsonData");
                 if (jsonData != null) {
                     try {
                         ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
@@ -142,14 +141,19 @@ public class ConstraintsActivity extends AppCompatActivity {
     }
 
     private void showReflectFields(List<ReflectField> reflectFields) {
-        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, myConstraints, new OnListItemClickedListener() {
+        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemLongClickedListener() {
             @Override
             public void onListItemLongClicked(final ReflectField reflectField) {
                 if (reflectField.getFieldType().isCollection() || reflectField.getFieldType().isArray()) {
                     Toast.makeText(ConstraintsActivity.this, "Constraints in collections and arrays are not supported", Toast.LENGTH_LONG).show();
                 } else if (userClasses.contains(reflectField.getFieldType().getName())) {
                     Intent intent = new Intent(ConstraintsActivity.this, ConstraintsActivity.class);
-                    intent.putExtra("className", classPath + "." + reflectField.getFieldType().getName());
+                    intent.putExtra("className", reflectField.getFieldType().getName());
+                    if (classPath != null) {
+                        intent.putExtra("classPath", classPath + "." + reflectField.getName());
+                    } else {
+                        intent.putExtra("classPath", reflectClassName + "." + reflectField.getName());
+                    }
                     try {
                         ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
                         constraintsJsonData.setConstraints(myConstraints);
@@ -167,7 +171,13 @@ public class ConstraintsActivity extends AppCompatActivity {
                                     reflectFieldsRecyclerViewAdapter.setHasConstraint(reflectField, true);
                                     reflectFieldsRecyclerViewAdapter.notifyDataSetChanged();
                                     MyConstraint myConstraint = new MyConstraint();
-                                    List<String> path = new ArrayList<>(Arrays.asList(classPath.split("\\.")));
+                                    List<String> path;
+                                    if (classPath != null) {
+                                        path = new ArrayList<>(Arrays.asList(classPath.split("\\.")));
+                                    } else {
+                                        path = new ArrayList<String>();
+                                        path.add(reflectClassName);
+                                    }
                                     path.add(reflectField.getName());
                                     myConstraint.setPath(path);
                                     myConstraint.setOperator(operator);
@@ -181,10 +191,22 @@ public class ConstraintsActivity extends AppCompatActivity {
                 }
             }
         });
+        for (ReflectField reflectField : reflectFields) {
+            String reflectFieldName = reflectField.getName();
+            for (MyConstraint myConstraint : myConstraints) {
+                List<String> path = myConstraint.getPath();
+                if (classPath != null) {
+                    String[] splitClassPath = classPath.split("\\.");
+                    if (path.get(path.size() - 2).equals(splitClassPath[splitClassPath.length-1]) && path.get(path.size() - 2).equals(reflectFieldName)) {
+                        reflectFieldsRecyclerViewAdapter.setHasConstraint(reflectField, true);
+                    }
+                }
+            }
+        }
         reflectFieldsRecyclerView.setAdapter(reflectFieldsRecyclerViewAdapter);
     }
 
-    public interface OnListItemClickedListener {
+    public interface OnListItemLongClickedListener {
         void onListItemLongClicked(ReflectField reflectField);
     }
 

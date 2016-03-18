@@ -128,7 +128,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                                     operator = -1;
                                     break;
                             }
-                            if (valueEditText.getVisibility() == View.INVISIBLE) {
+                            if (valueTextInputLayout.getVisibility() == View.VISIBLE) {
                                 value = valueEditText.getText().toString();
                             } else {
                                 value = valueSpinner.getSelectedItem().toString();
