@@ -15,10 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 
@@ -33,6 +34,7 @@ public class Initial extends AppCompatActivity
     private String username=null;
     private String password=null;
     */
+   private ListView ATTListView;
     private Menu menu;
     private String kClass = null;
     private List<ReflectClass> knownClasses;
@@ -60,7 +62,7 @@ public class Initial extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
+       ATTListView=(ListView)findViewById(R.id.fieldsKclasses);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         menu = navigationView.getMenu();
         knownClasses = new ArrayList<>();
@@ -121,6 +123,7 @@ public class Initial extends AppCompatActivity
         new LoadObjectsATTTask().execute();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -166,7 +169,11 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
-            // TODO: Edo malon prepei na emfanizeis ta ReflectFields
+            ATTListView.setAdapter(new ArrayAdapter<String>(
+                    getApplication().getBaseContext(),
+                    android.R.layout.simple_list_item_activated_1,
+                    android.R.id.text1, reflectATTListSTRING
+            ));
             mProgressDialog.dismiss();
         }
     }
