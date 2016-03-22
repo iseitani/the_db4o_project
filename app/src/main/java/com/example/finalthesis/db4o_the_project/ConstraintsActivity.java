@@ -66,7 +66,7 @@ public class ConstraintsActivity extends AppCompatActivity {
 
         classPath = getIntent().getExtras().getString("classPath");
         if (classPath != null) {
-            setTitle(classPath + " (" + reflectClassName + ")");
+            setTitle(classPath + "." + reflectClassName );
         } else {
             setTitle(reflectClassName);
         }
