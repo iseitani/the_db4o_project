@@ -124,6 +124,12 @@ public class ConstraintDialogFragment extends DialogFragment {
                                 case "<":
                                     operator = 1;
                                     break;
+                                case ">=" :
+                                    operator = 4;
+                                    break;
+                                case "<=" :
+                                    operator = 5;
+                                    break;
                                 case "Like":
                                     operator = 2;
                                     break;
