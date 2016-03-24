@@ -42,7 +42,7 @@ public class ConstraintDialogFragment extends DialogFragment {
     private String reflectClassName;
     private Spinner valueSpinner, operatorSpinner;
     private EditText valueEditText;
-    private TextInputLayout valueTe0xtInputLayout;
+    private TextInputLayout valueTextInputLayout;
     private boolean isBoolean = false;
     private static OnSaveButtonClickedListener mOnSaveButtonClickedListener;
     private AlertDialog mAlertDialog;

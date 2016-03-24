@@ -66,7 +66,7 @@ public class ConstraintsActivity extends AppCompatActivity {
 
         classPath = getIntent().getExtras().getString("classPath");
         if (classPath != null) {
-            setTitle(classPath + "." + reflectClassName );
+            setTitle(classPath + " (" + reflectClassName + ")");
         } else {
             setTitle(reflectClassName);
         }
@@ -175,7 +175,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                                     if (classPath != null) {
                                         path = new ArrayList<>(Arrays.asList(classPath.split("\\.")));
                                     } else {
-                                        path = new ArrayList<String>();
+                                        path = new ArrayList<>();
                                         path.add(reflectClassName);
                                     }
                                     path.add(reflectField.getName());
