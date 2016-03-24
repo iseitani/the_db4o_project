@@ -56,11 +56,12 @@ public class ConstraintDialogFragment extends DialogFragment {
         numbersOperators[1] = "=";
         numbersOperators[2] = ">";
         numbersOperators[3] = "<";
-        numbersOperators[4]=">=";
-        numbersOperators[5]="<=";
+        numbersOperators[4] = ">=";
+        numbersOperators[5] = "<=";
 
     }
-//Na dw operators gia String & CHAR
+
+    //Na dw operators gia String & CHAR
     private static final String[] stringOperators = new String[3];
 
     static {
@@ -89,7 +90,7 @@ public class ConstraintDialogFragment extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
-//
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,10 +125,10 @@ public class ConstraintDialogFragment extends DialogFragment {
                                 case "<":
                                     operator = 1;
                                     break;
-                                case ">=" :
+                                case ">=":
                                     operator = 4;
                                     break;
-                                case "<=" :
+                                case "<=":
                                     operator = 5;
                                     break;
                                 case "Like":
@@ -204,7 +205,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                 break;
             default:
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, numbersOperators);
-                if (reflectFieldType.equals("java.util.Date")||reflectFieldType.equals("java.sql.Date")) {
+                if (reflectFieldType.equals("java.util.Date") || reflectFieldType.equals("java.sql.Date")) {
                     valueEditText.setInputType(InputType.TYPE_CLASS_DATETIME);
                 } else {
                     int type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
@@ -217,7 +218,8 @@ public class ConstraintDialogFragment extends DialogFragment {
         operatorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().equals("=")) {
+                String selectedOperator = parent.getItemAtPosition(position).toString();
+                if (selectedOperator.equals("=") || selectedOperator.equals("Equals")) {
                     valueTextInputLayout.setVisibility(View.INVISIBLE);
                     valueSpinner.setVisibility(View.VISIBLE);
                     if (isBoolean) {
