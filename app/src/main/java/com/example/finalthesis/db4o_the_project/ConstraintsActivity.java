@@ -197,7 +197,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                 List<String> path = myConstraint.getPath();
                 if (classPath != null) {
                     String[] splitClassPath = classPath.split("\\.");
-                    if (path.get(path.size() - 2).equals(splitClassPath[splitClassPath.length-1]) && path.get(path.size() - 2).equals(reflectFieldName)) {
+                    if (path.get(path.size() - 2).equals(splitClassPath[splitClassPath.length-1]) && path.get(path.size() - 1).equals(reflectFieldName)) {
                         reflectFieldsRecyclerViewAdapter.setHasConstraint(reflectField, true);
                     }
                 }
