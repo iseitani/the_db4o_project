@@ -1,12 +1,14 @@
 package com.example.finalthesis.db4o_the_project;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,7 +49,7 @@ public class ConstraintsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constraints);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -85,9 +87,26 @@ public class ConstraintsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = reflectFieldsRecyclerViewAdapter.getSelectedItems().size() + " fields selected";
-                Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                final String[] operators = new String[]{"AND", "OR"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
+                builder.setTitle("Select operator")
+                        .setItems(operators, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO: Vale to sosto onoma tis activity sou kai vgale ta sxoleia
+//                                Intent intent = new Intent(ConstraintsActivity.this, IliasActivity.class);
+//                                ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+//                                constraintsJsonData.setConstraints(myConstraints);
+//                                constraintsJsonData.setOperator(which);
+//                                try {
+//                                    intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+//                                    Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+//                                } catch (JsonProcessingException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                startActivity(intent);
+                            }
+                        });
+                builder.create().show();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -197,7 +216,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                 List<String> path = myConstraint.getPath();
                 if (classPath != null) {
                     String[] splitClassPath = classPath.split("\\.");
-                    if (path.get(path.size() - 2).equals(splitClassPath[splitClassPath.length-1]) && path.get(path.size() - 1).equals(reflectFieldName)) {
+                    if (path.get(path.size() - 2).equals(splitClassPath[splitClassPath.length - 1]) && path.get(path.size() - 1).equals(reflectFieldName)) {
                         reflectFieldsRecyclerViewAdapter.setHasConstraint(reflectField, true);
                     }
                 }

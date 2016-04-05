@@ -16,6 +16,9 @@ public class ConstraintsJsonData {
     @JsonProperty("constraints")
     private List<MyConstraint> constraints = new ArrayList<>();
 
+    @JsonProperty("operator")
+    private Integer operator;
+
     /**
      * @return The constraints
      */
@@ -30,6 +33,22 @@ public class ConstraintsJsonData {
     @JsonProperty("constraints")
     public void setConstraints(List<MyConstraint> constraints) {
         this.constraints = constraints;
+    }
+
+    /**
+     * @return The operator
+     */
+    @JsonProperty("operator")
+    public Integer getOperator() {
+        return operator;
+    }
+
+    /**
+     * @param operator The operator
+     */
+    @JsonProperty("operator")
+    public void setOperator(Integer operator) {
+        this.operator = operator;
     }
 
 }

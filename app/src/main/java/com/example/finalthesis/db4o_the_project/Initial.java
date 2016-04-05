@@ -34,7 +34,7 @@ public class Initial extends AppCompatActivity
     private String username=null;
     private String password=null;
     */
-   private ListView ATTListView;
+    private ListView ATTListView;
     private Menu menu;
     private String kClass = null;
     private List<ReflectClass> knownClasses;
@@ -62,7 +62,7 @@ public class Initial extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-       ATTListView=(ListView)findViewById(R.id.fieldsKclasses);
+        ATTListView = (ListView) findViewById(R.id.fieldsKclasses);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         menu = navigationView.getMenu();
         knownClasses = new ArrayList<>();
