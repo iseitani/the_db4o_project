@@ -18,6 +18,8 @@ import android.view.View;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
+import com.db4o.query.Constraint;
+import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
@@ -102,6 +104,25 @@ public class RecursivePrint extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public Constraint MyQ(List<Object> s, Query q, int operator) {
+        if (s.size() == 1) {
+            switch(operator){
+                case 0:
+                    return q.constrain(s.get(0)).greater();
+                case 1:
+                    return q.constrain(s.get(0)).smaller();
+                case 2:
+                    return q.constrain(s.get(0)).like();
+                case 3:
+                    return q.constrain(s.get(0));
+            }
+        }
+
+        Query sub = q.descend(s.get(0).toString());
+        s.remove(0);
+        return MyQ(s, sub, operator);
     }
 
     class GetReflectFields extends AsyncTask<String, Void, Void> {
