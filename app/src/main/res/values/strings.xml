@@ -6,4 +6,5 @@
     <string name="sectionB">Query Selected Class</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_constraints">ConstraintsActivity</string>
+    <string name="title_activity_recursive_print">RecursivePrint</string>
 </resources>

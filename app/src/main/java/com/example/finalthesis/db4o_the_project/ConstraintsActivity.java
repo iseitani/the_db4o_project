@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsRecyclerViewAdapter;
@@ -92,18 +90,17 @@ public class ConstraintsActivity extends AppCompatActivity {
                 builder.setTitle("Select operator")
                         .setItems(operators, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // TODO: Vale to sosto onoma tis activity sou kai vgale ta sxoleia
-//                                Intent intent = new Intent(ConstraintsActivity.this, IliasActivity.class);
-//                                ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
-//                                constraintsJsonData.setConstraints(myConstraints);
-//                                constraintsJsonData.setOperator(which);
-//                                try {
-//                                    intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
-//                                    Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-//                                } catch (JsonProcessingException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                startActivity(intent);
+                                Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
+                                ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                                constraintsJsonData.setConstraints(myConstraints);
+                                constraintsJsonData.setOperator(which);
+                                try {
+                                    intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                                    Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                                startActivity(intent);
                             }
                         });
                 builder.create().show();

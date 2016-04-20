@@ -31,6 +31,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.finalthesis.db4o_the_project.Initial" />
         </activity>
+        <activity
+            android:name=".RecursivePrint"
+            android:label="@string/title_activity_recursive_print"
+            android:parentActivityName=".ConstraintsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.finalthesis.db4o_the_project.ConstraintsActivity" />
+        </activity>
     </application>
 
 </manifest>
