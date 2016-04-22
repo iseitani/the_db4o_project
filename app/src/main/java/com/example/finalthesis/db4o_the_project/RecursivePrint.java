@@ -3,7 +3,6 @@ package com.example.finalthesis.db4o_the_project;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -16,9 +15,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
+import com.db4o.cs.Db4oClientServer;
 import com.db4o.query.Constraint;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
@@ -161,8 +160,8 @@ public class RecursivePrint extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... params) {
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.6.153", 4000, "olympic", "olympic");
+            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
             ReflectField[] allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
             for (ReflectField reflectField : allReflectFields) {
                 if (!reflectField.getFieldType().getName().contains(".Object")) {
@@ -204,9 +203,9 @@ public class RecursivePrint extends AppCompatActivity {
                 for (ReflectField reflectField : reflectFields) {
                     Object value = reflectField.get(o);
                     if (value != null) {
-                        valuesToPrint.add(reflectField.getName() + ": " + reflectField.get(o).toString());
+                        valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
                     } else {
-                        valuesToPrint.add(reflectField.getName() + ": null");
+                        valuesToPrint.add(reflectField.getName() + " : null");
                     }
                 }
             }

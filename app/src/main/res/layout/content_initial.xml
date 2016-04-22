@@ -10,12 +10,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.finalthesis.db4o_the_project.Initial"
-    tools:showIn="@layout/app_bar_initial">
+    tools:showIn="@layout/app_bar_initial"
+    android:background="#0c0b0b">
 
  <ListView
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:id="@+id/fieldsKclasses">
+     android:id="@+id/fieldsKclasses"
+     android:textColor="#FF0000"
+     android:background="#171212">
 
  </ListView>
 </RelativeLayout>
