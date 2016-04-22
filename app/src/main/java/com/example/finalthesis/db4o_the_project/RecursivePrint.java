@@ -112,17 +112,42 @@ public class RecursivePrint extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private Object NoNeedToKnowMyFunctionality(Object value, Object type){
+        Object temp=null;
+        /*
+        switch (type.toString()){
+            case ReflectMTypes.FLOAT:
+                temp=Float.parseFloat(value.toString());
+                break;
+            case ReflectMTypes.INT:
+                temp=Integer.parseInt(value.toString());
+                break;
+           default:
+               temp=value;
+        }*/
+        if(type.toString().equalsIgnoreCase(ReflectMTypes.INT)){
+            temp=Integer.parseInt(value.toString());
+        }
+        else if (type.toString().equalsIgnoreCase(ReflectMTypes.FLOAT)){
+            temp=Float.parseFloat(value.toString());
+        }
+        else{
+            temp=value;
+        }
+        return temp;
+    }
+
     public Constraint MyQ(List<Object> s, Query q, int operator) {
-        if (s.size() == 1) {
+        if (s.size() == 2) {
             switch (operator) {
                 case Constants.GREATER_OPERATOR:
-                    return q.constrain(s.get(0)).greater();
+                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1),s.get(0))).greater();
                 case Constants.SMALLER_OPERATOR:
-                    return q.constrain(s.get(0)).smaller();
+                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1), s.get(0))).smaller();
                 case Constants.LIKE_OPERATOR:
                     return q.constrain(s.get(0)).like();
                 case Constants.EQUALS_OPERATOR:
-                    return q.constrain(s.get(0));
+                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1),s.get(0)));
             }
         }
         // Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
@@ -183,6 +208,7 @@ public class RecursivePrint extends AppCompatActivity {
                 List<Object> s = new ArrayList<>();
                 s.addAll(myConstraint.getPath());
                 s.add(myConstraint.getValue());
+                s.add(myConstraint.getReflectFieldType());
                 s.remove(0);
                 if (lasConstraint != null) {
                     switch (queryOperator) {
