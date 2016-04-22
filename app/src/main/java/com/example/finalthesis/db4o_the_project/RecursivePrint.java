@@ -18,10 +18,12 @@ import android.view.View;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
 import com.db4o.query.Constraint;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
+import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsValuesRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 import com.example.finalthesis.db4o_the_project.views.DividerItemDecoration;
@@ -34,8 +36,11 @@ import java.util.List;
 public class RecursivePrint extends AppCompatActivity {
 
     private RecyclerView recursiveRecyclerView;
-    private List<MyConstraint> myConstraints;
+    private ReflectFieldsValuesRecyclerViewAdapter reflectFieldsValuesRecyclerViewAdapter;
+    private ConstraintsJsonData constraintsJsonData;
     private static ObjectMapper mapper = new ObjectMapper();
+    private List<String> userClasses;
+
     /*
       for selected fields preview, at the end of the project I will upload the class
       private List<MyFields> myFields;
@@ -47,10 +52,12 @@ public class RecursivePrint extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        myConstraints = new ArrayList<>();
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         recursiveRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+//        List<String> emptyList = new ArrayList<>();
+//        reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(emptyList, null, null);
+//        recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
 
         //For XML
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -66,12 +73,12 @@ public class RecursivePrint extends AppCompatActivity {
         String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
         if (jsonData != null) {
             try {
-                ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-                myConstraints = constraintsJsonData.getConstraints();
+                constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        new GetReflectFields().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
     }
 
     @Override
@@ -108,18 +115,25 @@ public class RecursivePrint extends AppCompatActivity {
 
     public Constraint MyQ(List<Object> s, Query q, int operator) {
         if (s.size() == 1) {
-            switch(operator){
-                case 0:
+            switch (operator) {
+                case Constants.GREATER_OPERATOR:
                     return q.constrain(s.get(0)).greater();
-                case 1:
+                case Constants.SMALLER_OPERATOR:
                     return q.constrain(s.get(0)).smaller();
-                case 2:
+                case Constants.LIKE_OPERATOR:
                     return q.constrain(s.get(0)).like();
-                case 3:
+                case Constants.EQUALS_OPERATOR:
                     return q.constrain(s.get(0));
             }
         }
-
+        // Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
+        // ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
+        switch (operator) {
+            case Constants.GREATER_EQUALS_OPERATOR:
+                return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
+            case Constants.SMALLER_EQUALS_OPERATOR:
+                return MyQ(s, q, Constants.SMALLER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
+        }
         Query sub = q.descend(s.get(0).toString());
         s.remove(0);
         return MyQ(s, sub, operator);
@@ -129,11 +143,14 @@ public class RecursivePrint extends AppCompatActivity {
 
         ProgressDialog mProgressDialog;
         List<ReflectField> reflectFields;
+        List<String> valuesToPrint;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             reflectFields = new ArrayList<>();
+            userClasses = new ArrayList<>();
+            valuesToPrint = new ArrayList<>();
             mProgressDialog = new ProgressDialog(RecursivePrint.this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setTitle("Loading Results");
@@ -155,7 +172,42 @@ public class RecursivePrint extends AppCompatActivity {
             ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
             for (ReflectClass reflectClass : reflectClasses) {
                 if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
-                 //   userClasses.add(reflectClass.getName());
+                    userClasses.add(reflectClass.getName());
+                }
+            }
+            // Building query
+            Query query = db.query();
+            query.constrain(db.ext().reflector().forName(params[0]));
+            int queryOperator = constraintsJsonData.getOperator();
+            Constraint lasConstraint = null;
+            for (MyConstraint myConstraint : constraintsJsonData.getConstraints()) {
+                List<Object> s = new ArrayList<>();
+                s.addAll(myConstraint.getPath());
+                s.add(myConstraint.getValue());
+                s.remove(0);
+                if (lasConstraint != null) {
+                    switch (queryOperator) {
+                        case Constants.AND_OPERATOR:
+                            lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
+                            break;
+                        case Constants.OR_OPERATOR:
+                            lasConstraint = lasConstraint.or(MyQ(s, query, myConstraint.getOperator()));
+                            break;
+                    }
+                } else {
+                    lasConstraint = MyQ(s, query, myConstraint.getOperator());
+                }
+            }
+            // Execute query
+            ObjectSet objectSet = query.execute();
+            for (Object o : objectSet) {
+                for (ReflectField reflectField : reflectFields) {
+                    Object value = reflectField.get(o);
+                    if (value != null) {
+                        valuesToPrint.add(reflectField.getName() + ": " + reflectField.get(o).toString());
+                    } else {
+                        valuesToPrint.add(reflectField.getName() + ": null");
+                    }
                 }
             }
             db.close();
@@ -166,6 +218,14 @@ public class RecursivePrint extends AppCompatActivity {
         protected void onPostExecute(Void tmpt) {
             super.onPostExecute(tmpt);
             //showFields(fFields);
+            reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnListItemClickedListener() {
+                @Override
+                public void onListItemClicked(ReflectField reflectField) {
+                    // Edo tha vlepoume an einai anafora se allo antikeimeno
+                }
+            });
+            recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
+            reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
             mProgressDialog.dismiss();
         }
     }

@@ -29,6 +29,7 @@ import com.db4o.cs.Db4oClientServer;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
+import com.example.finalthesis.db4o_the_project.Constants;
 import com.example.finalthesis.db4o_the_project.R;
 
 public class ConstraintDialogFragment extends DialogFragment {
@@ -117,22 +118,23 @@ public class ConstraintDialogFragment extends DialogFragment {
                             String value;
                             switch (operatorSpinner.getSelectedItem().toString()) {
                                 case "=":
-                                    operator = 3;
+                                case "Equals":
+                                    operator = Constants.EQUALS_OPERATOR;
                                     break;
                                 case ">":
-                                    operator = 0;
+                                    operator = Constants.GREATER_OPERATOR;
                                     break;
                                 case "<":
-                                    operator = 1;
+                                    operator = Constants.SMALLER_OPERATOR;
                                     break;
                                 case ">=":
-                                    operator = 4;
+                                    operator = Constants.GREATER_EQUALS_OPERATOR;
                                     break;
                                 case "<=":
-                                    operator = 5;
+                                    operator = Constants.SMALLER_EQUALS_OPERATOR;
                                     break;
                                 case "Like":
-                                    operator = 2;
+                                    operator = Constants.LIKE_OPERATOR;
                                     break;
                                 default:
                                     operator = -1;
