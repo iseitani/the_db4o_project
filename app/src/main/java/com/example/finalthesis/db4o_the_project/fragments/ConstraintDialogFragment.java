@@ -290,7 +290,7 @@ public class ConstraintDialogFragment extends DialogFragment {
 
         protected Void doInBackground(Void... params) {
             //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
+            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
             ReflectClass reflectClass = db.ext().reflector().forName(reflectClassName);
             ReflectField reflectField = reflectClass.getDeclaredField(reflectFieldName);
             Query query = db.query();
