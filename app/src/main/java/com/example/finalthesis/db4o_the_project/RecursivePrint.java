@@ -145,7 +145,7 @@ public class RecursivePrint extends AppCompatActivity {
         return temp;
     }
 
-    public Constraint buildConstraint(List<Object> s, Query q, int operator) {
+    public Constraint MyQ(List<Object> s, Query q, int operator) {
         if (s.size() == 2) {
             switch (operator) {
                 case Constants.GREATER_OPERATOR:
@@ -162,13 +162,13 @@ public class RecursivePrint extends AppCompatActivity {
         // ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
         switch (operator) {
             case Constants.GREATER_EQUALS_OPERATOR:
-                return buildConstraint(s, q, Constants.GREATER_OPERATOR).or(buildConstraint(s, q, Constants.EQUALS_OPERATOR));
+                return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
             case Constants.SMALLER_EQUALS_OPERATOR:
-                return buildConstraint(s, q, Constants.SMALLER_OPERATOR).or(buildConstraint(s, q, Constants.EQUALS_OPERATOR));
+                return MyQ(s, q, Constants.SMALLER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
         }
         Query sub = q.descend(s.get(0).toString());
         s.remove(0);
-        return buildConstraint(s, sub, operator);
+        return MyQ(s, sub, operator);
     }
 
     class RunQuery extends AsyncTask<String, Void, Void> {
@@ -221,14 +221,14 @@ public class RecursivePrint extends AppCompatActivity {
                 if (lasConstraint != null) {
                     switch (queryOperator) {
                         case Constants.AND_OPERATOR:
-                            lasConstraint = lasConstraint.and(buildConstraint(s, query, myConstraint.getOperator()));
+                            lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
                             break;
                         case Constants.OR_OPERATOR:
-                            lasConstraint = lasConstraint.or(buildConstraint(s, query, myConstraint.getOperator()));
+                            lasConstraint = lasConstraint.or(MyQ(s, query, myConstraint.getOperator()));
                             break;
                     }
                 } else {
-                    lasConstraint = buildConstraint(s, query, myConstraint.getOperator());
+                    lasConstraint = MyQ(s, query, myConstraint.getOperator());
                 }
             }
             // Execute query
