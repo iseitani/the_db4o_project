@@ -43,7 +43,8 @@ public class RecursivePrint extends AppCompatActivity {
     private ConstraintsJsonData constraintsJsonData;
     private static ObjectMapper mapper = new ObjectMapper();
     private List<String> userClasses;
-    int reflectClassIndex;
+    private int reflectClassIndex;
+    private String currentPath;
 
     /*
       for selected fields preview, at the end of the project I will upload the class
@@ -56,7 +57,7 @@ public class RecursivePrint extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
+        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
         if (jsonData != null) {
             try {
                 constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
@@ -65,7 +66,8 @@ public class RecursivePrint extends AppCompatActivity {
             }
         }
 
-        reflectClassIndex = getIntent().getExtras().getInt("reflectClassIndex");
+        reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+        // currentPath=getIntent().getStringExtra("currentPath");
 
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,8 +92,37 @@ public class RecursivePrint extends AppCompatActivity {
         new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
     }
 
+    //Grammh 92 einai to error 8a prepei na phgainei mpros pisw
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                String jsonData = data.getExtras().getString("ConstraintsJsonData");
+                //remove the previous class
+                try {
+                    String tempcurrentPath = data.getStringExtra("currentPath");
+                    StringBuffer text = new StringBuffer(tempcurrentPath);
+                    text.replace(text.lastIndexOf(":"), text.length() - 1, "");
+                } catch (Exception ex) {
+                }
+
+                if (jsonData != null) {
+                    try {
+                        ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
+                        myConstraints = constraintsJsonData.getConstraints();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
+        //Oi grammes 105-106 mporoun na grafoun edw h ekei pou einai
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -122,19 +153,20 @@ public class RecursivePrint extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private Object correctValueType(Object value, Object type) {
+    private Object correctGeorgesBugs(Object value, Object type) {
         Object temp = null;
-        /*
-        switch (type.toString()){
+
+        switch (type.toString()) {
             case ReflectMTypes.FLOAT:
-                temp=Float.parseFloat(value.toString());
+                temp = Float.parseFloat(value.toString());
                 break;
             case ReflectMTypes.INT:
-                temp=Integer.parseInt(value.toString());
+                temp = Integer.parseInt(value.toString());
                 break;
-           default:
-               temp=value;
-        }*/
+            default:
+                temp = value;
+        }
+        /*
         if (type.toString().equalsIgnoreCase(ReflectMTypes.INT)) {
             temp = Integer.parseInt(value.toString());
         } else if (type.toString().equalsIgnoreCase(ReflectMTypes.FLOAT)) {
@@ -142,6 +174,7 @@ public class RecursivePrint extends AppCompatActivity {
         } else {
             temp = value;
         }
+        */
         return temp;
     }
 
@@ -149,22 +182,21 @@ public class RecursivePrint extends AppCompatActivity {
         if (s.size() == 2) {
             switch (operator) {
                 case Constants.GREATER_OPERATOR:
-                    return q.constrain(correctValueType(s.get(0), s.get(1))).greater();
+                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1))).greater();
                 case Constants.SMALLER_OPERATOR:
-                    return q.constrain(correctValueType(s.get(0), s.get(1))).smaller();
+                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1))).smaller();
                 case Constants.LIKE_OPERATOR:
                     return q.constrain(s.get(0)).like();
                 case Constants.EQUALS_OPERATOR:
-                    return q.constrain(correctValueType(s.get(0), s.get(1)));
+                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1)));
+              /* Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
+              ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
+              */
+                case Constants.GREATER_EQUALS_OPERATOR:
+                    return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
+                case Constants.SMALLER_EQUALS_OPERATOR:
+                    return MyQ(s, q, Constants.SMALLER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
             }
-        }
-        // Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
-        // ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
-        switch (operator) {
-            case Constants.GREATER_EQUALS_OPERATOR:
-                return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
-            case Constants.SMALLER_EQUALS_OPERATOR:
-                return MyQ(s, q, Constants.SMALLER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
         }
         Query sub = q.descend(s.get(0).toString());
         s.remove(0);
@@ -192,6 +224,9 @@ public class RecursivePrint extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(String... params) {
+
+            //Start
+
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
             //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
@@ -207,6 +242,8 @@ public class RecursivePrint extends AppCompatActivity {
                     userClasses.add(reflectClass.getName());
                 }
             }
+            //end
+
             // Building query
             Query query = db.query();
             query.constrain(db.ext().reflector().forName(params[0]));
@@ -243,6 +280,7 @@ public class RecursivePrint extends AppCompatActivity {
         }
 
         private void printAllObjects(ObjectSet objectSet) {
+            //NOT THE WHOLE OBJECT(?)
             for (Object o : objectSet) {
                 valuesToPrint.add(o.toString());
             }
@@ -268,6 +306,34 @@ public class RecursivePrint extends AppCompatActivity {
                     @Override
                     public void onListItemClicked(ReflectField reflectField) {
                         // Edo tha vlepoume an einai anafora se allo antikeimeno
+                        if (userClasses.contains(reflectField.getName())) {
+                            //Einai Anafora
+                        }
+                        //Pou tha bazoume to path otan ftanei sth nea class h prin fygei ap thn yparxousa???
+                        /*
+                        List<String> tempL = new ArrayList<String>(Arrays.asList(currentPath.split(":")));
+                        String temp2 = //"TO_ONOMA_THS_KLASHS_POY_THA_PAS";
+                        if (tempL.contains(temp2)) {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+                            alertDialogBuilder.setTitle("You already have viewed "+temp2);
+                            alertDialogBuilder.setMessage("You cannot view "+temp2+" again");
+                            alertDialogBuilder.setNeutralButton("Close", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    return;
+                                }
+                            });
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                        } else {
+                                Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
+                                intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                                intent.putExtra("reflectClassIndex", reflectClassIndex);
+                                currentPath=currentPath.concat(":TO_ONOMA_THS_KLASHS_POY_THA_PAS|EISAI");
+                                intent.putExtra("currentPath",currentPath);
+                                startActivity(intent);
+                               }
+                        */
                     }
                 });
                 recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
@@ -276,12 +342,13 @@ public class RecursivePrint extends AppCompatActivity {
                 ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(valuesToPrint, new OnReflectClassItemClickedListener() {
                     @Override
                     public void onListItemClicked(int reflectClassIndex) {
+
                         Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
                         try {
                             intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                             intent.putExtra("reflectClassIndex", reflectClassIndex);
                             Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-                        } catch (JsonProcessingException e) {
+                        } catch (JsonProcessingException e) {//why not Exception ,it can be anything
                             e.printStackTrace();
                         }
                         startActivity(intent);

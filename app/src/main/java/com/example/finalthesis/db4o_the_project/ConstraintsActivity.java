@@ -244,6 +244,8 @@ public class ConstraintsActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(String... params) {
+
+            //Start
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
             //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
@@ -260,6 +262,8 @@ public class ConstraintsActivity extends AppCompatActivity {
                 }
             }
             db.close();
+
+
             return null;
         }
 
