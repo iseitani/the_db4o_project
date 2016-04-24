@@ -13,14 +13,12 @@ import com.example.finalthesis.db4o_the_project.RecursivePrint;
 
 import java.util.List;
 
-public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter<ReflectFieldsValuesRecyclerViewAdapter.ViewHolder> {
+public class ReflectClassesResultsRecyclerViewAdapter extends RecyclerView.Adapter<ReflectClassesResultsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<ReflectField> reflectFields;
     private final List<String> mValues;
-    private final RecursivePrint.OnReflectFieldItemClickedListener mListener;
+    private final RecursivePrint.OnReflectClassItemClickedListener mListener;
 
-    public ReflectFieldsValuesRecyclerViewAdapter(List<String> items, List<ReflectField> reflectFields, RecursivePrint.OnReflectFieldItemClickedListener listener) {
-        this.reflectFields = reflectFields;
+    public ReflectClassesResultsRecyclerViewAdapter(List<String> items, RecursivePrint.OnReflectClassItemClickedListener listener) {
         this.mValues = items;
         mListener = listener;
     }
@@ -33,8 +31,7 @@ public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        final ReflectField reflectField = reflectFields.get(position);
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         String textToShow = mValues.get(position);
         holder.mItem = textToShow;
         holder.mNameView.setText(textToShow);
@@ -45,7 +42,7 @@ public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemClicked(reflectField);
+                    mListener.onListItemClicked(position);
                 }
             }
         });

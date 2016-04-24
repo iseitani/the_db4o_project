@@ -1,6 +1,7 @@
 package com.example.finalthesis.db4o_the_project;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,10 +24,12 @@ import com.db4o.query.Constraint;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
+import com.example.finalthesis.db4o_the_project.adapters.ReflectClassesResultsRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsValuesRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 import com.example.finalthesis.db4o_the_project.views.DividerItemDecoration;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -39,6 +43,7 @@ public class RecursivePrint extends AppCompatActivity {
     private ConstraintsJsonData constraintsJsonData;
     private static ObjectMapper mapper = new ObjectMapper();
     private List<String> userClasses;
+    int reflectClassIndex;
 
     /*
       for selected fields preview, at the end of the project I will upload the class
@@ -50,6 +55,17 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
+        if (jsonData != null) {
+            try {
+                constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        reflectClassIndex = getIntent().getExtras().getInt("reflectClassIndex");
 
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -71,15 +87,6 @@ public class RecursivePrint extends AppCompatActivity {
             }
         });
 
-
-        String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
-        if (jsonData != null) {
-            try {
-                constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
     }
 
@@ -226,38 +233,73 @@ public class RecursivePrint extends AppCompatActivity {
             }
             // Execute query
             ObjectSet objectSet = query.execute();
-            for (Object o : objectSet) {
-                for (ReflectField reflectField : reflectFields) {
-                    Object value = reflectField.get(o);
-                    if (value != null) {
-                        valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
-                    } else {
-                        valuesToPrint.add(reflectField.getName() + " : null");
-                    }
-                }
+            if (reflectClassIndex != -1) {
+                printObject(objectSet.get(reflectClassIndex));
+            } else {
+                printAllObjects(objectSet);
             }
             db.close();
             return null;
+        }
+
+        private void printAllObjects(ObjectSet objectSet) {
+            for (Object o : objectSet) {
+                valuesToPrint.add(o.toString());
+            }
+        }
+
+        private void printObject(Object o) {
+            for (ReflectField reflectField : reflectFields) {
+                Object value = reflectField.get(o);
+                if (value != null) {
+                    valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
+                } else {
+                    valuesToPrint.add(reflectField.getName() + " : null");
+                }
+            }
         }
 
         @Override
         protected void onPostExecute(Void tmpt) {
             super.onPostExecute(tmpt);
             //showFields(fFields);
-            reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnListItemClickedListener() {
-                @Override
-                public void onListItemClicked(ReflectField reflectField) {
-                    // Edo tha vlepoume an einai anafora se allo antikeimeno
-                }
-            });
-            recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
-            reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
+            if (reflectClassIndex != -1) {
+                reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnReflectFieldItemClickedListener() {
+                    @Override
+                    public void onListItemClicked(ReflectField reflectField) {
+                        // Edo tha vlepoume an einai anafora se allo antikeimeno
+                    }
+                });
+                recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
+                reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
+            } else {
+                ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(valuesToPrint, new OnReflectClassItemClickedListener() {
+                    @Override
+                    public void onListItemClicked(int reflectClassIndex) {
+                        Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
+                        try {
+                            intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                            intent.putExtra("reflectClassIndex", reflectClassIndex);
+                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                        startActivity(intent);
+                    }
+                });
+                recursiveRecyclerView.setAdapter(reflectClassesResultsRecyclerViewAdapter);
+                reflectClassesResultsRecyclerViewAdapter.notifyDataSetChanged();
+            }
+
             mProgressDialog.dismiss();
         }
     }
 
-    public interface OnListItemClickedListener {
+    public interface OnReflectFieldItemClickedListener {
         void onListItemClicked(ReflectField reflectField);
     }
 
+    public interface OnReflectClassItemClickedListener {
+        void onListItemClicked(int reflectClassIndex);
+    }
 }

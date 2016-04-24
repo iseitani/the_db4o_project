@@ -95,6 +95,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                                 constraintsJsonData.setOperator(which);
                                 try {
                                     intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                                    intent.putExtra("reflectClassIndex", -1);
                                     Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
                                 } catch (JsonProcessingException e) {
                                     e.printStackTrace();
