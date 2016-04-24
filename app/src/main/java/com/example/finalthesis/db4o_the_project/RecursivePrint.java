@@ -54,9 +54,12 @@ public class RecursivePrint extends AppCompatActivity {
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         recursiveRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-//        List<String> emptyList = new ArrayList<>();
-//        reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(emptyList, null, null);
-//        recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
+
+        // Auto merikes fores xriazete ama kathisterisei to query
+        // giati ama den exei adapter to RecyclerView den kanei kan ton kopo na zografistei
+        List<String> emptyList = new ArrayList<>();
+        reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(emptyList, null, null);
+        recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
 
         //For XML
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -77,7 +80,7 @@ public class RecursivePrint extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        new GetReflectFields().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
+        new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
     }
 
     @Override
@@ -112,8 +115,8 @@ public class RecursivePrint extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private Object NoNeedToKnowMyFunctionality(Object value, Object type){
-        Object temp=null;
+    private Object correctValueType(Object value, Object type) {
+        Object temp = null;
         /*
         switch (type.toString()){
             case ReflectMTypes.FLOAT:
@@ -125,45 +128,43 @@ public class RecursivePrint extends AppCompatActivity {
            default:
                temp=value;
         }*/
-        if(type.toString().equalsIgnoreCase(ReflectMTypes.INT)){
-            temp=Integer.parseInt(value.toString());
-        }
-        else if (type.toString().equalsIgnoreCase(ReflectMTypes.FLOAT)){
-            temp=Float.parseFloat(value.toString());
-        }
-        else{
-            temp=value;
+        if (type.toString().equalsIgnoreCase(ReflectMTypes.INT)) {
+            temp = Integer.parseInt(value.toString());
+        } else if (type.toString().equalsIgnoreCase(ReflectMTypes.FLOAT)) {
+            temp = Float.parseFloat(value.toString());
+        } else {
+            temp = value;
         }
         return temp;
     }
 
-    public Constraint MyQ(List<Object> s, Query q, int operator) {
+    public Constraint buildConstraint(List<Object> s, Query q, int operator) {
         if (s.size() == 2) {
             switch (operator) {
                 case Constants.GREATER_OPERATOR:
-                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1),s.get(0))).greater();
+                    return q.constrain(correctValueType(s.get(0), s.get(1))).greater();
                 case Constants.SMALLER_OPERATOR:
-                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1), s.get(0))).smaller();
+                    return q.constrain(correctValueType(s.get(0), s.get(1))).smaller();
                 case Constants.LIKE_OPERATOR:
                     return q.constrain(s.get(0)).like();
                 case Constants.EQUALS_OPERATOR:
-                    return q.constrain(NoNeedToKnowMyFunctionality(s.get(1),s.get(0)));
+                    return q.constrain(correctValueType(s.get(0), s.get(1)));
             }
         }
         // Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
         // ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
         switch (operator) {
             case Constants.GREATER_EQUALS_OPERATOR:
-                return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
+                return buildConstraint(s, q, Constants.GREATER_OPERATOR).or(buildConstraint(s, q, Constants.EQUALS_OPERATOR));
             case Constants.SMALLER_EQUALS_OPERATOR:
-                return MyQ(s, q, Constants.SMALLER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
+                return buildConstraint(s, q, Constants.SMALLER_OPERATOR).or(buildConstraint(s, q, Constants.EQUALS_OPERATOR));
         }
         Query sub = q.descend(s.get(0).toString());
         s.remove(0);
-        return MyQ(s, sub, operator);
+        return buildConstraint(s, sub, operator);
     }
 
-    class GetReflectFields extends AsyncTask<String, Void, Void> {
+    class RunQuery extends AsyncTask<String, Void, Void> {
 
         ProgressDialog mProgressDialog;
         List<ReflectField> reflectFields;
@@ -213,14 +214,14 @@ public class RecursivePrint extends AppCompatActivity {
                 if (lasConstraint != null) {
                     switch (queryOperator) {
                         case Constants.AND_OPERATOR:
-                            lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
+                            lasConstraint = lasConstraint.and(buildConstraint(s, query, myConstraint.getOperator()));
                             break;
                         case Constants.OR_OPERATOR:
-                            lasConstraint = lasConstraint.or(MyQ(s, query, myConstraint.getOperator()));
+                            lasConstraint = lasConstraint.or(buildConstraint(s, query, myConstraint.getOperator()));
                             break;
                     }
                 } else {
-                    lasConstraint = MyQ(s, query, myConstraint.getOperator());
+                    lasConstraint = buildConstraint(s, query, myConstraint.getOperator());
                 }
             }
             // Execute query
