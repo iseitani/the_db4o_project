@@ -102,15 +102,14 @@ public class ConstraintsActivity extends AppCompatActivity {
                                     } catch (JsonProcessingException e) {
                                         e.printStackTrace();
                                     }
-                                    //startActivity(intent);
+                                    startActivity(intent); //Auto einai edo giati prota prepei na epileksei o xristis ton operator
                                 }
                             });
                     builder.create().show();
                 } else {
-                        intent.putExtra("QueryFlag",false);
+                    intent.putExtra("QueryFlag",false);
+                    startActivity(intent);
                 }
-                //
-                startActivity(intent);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

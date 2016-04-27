@@ -24,6 +24,7 @@ import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Constraint;
+import com.db4o.query.Constraints;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
@@ -64,23 +65,24 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        QueryFlag=getIntent().getBooleanExtra("QueryFlag",false);
-            String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
-            if (jsonData != null) {
-                try {
-                    constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        QueryFlag = getIntent().getBooleanExtra("QueryFlag", false);
+        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
+        if (jsonData != null) {
+            try {
+                constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
-            classPath = getIntent().getStringExtra("classPath");
-            if (classPath != null) {
-                classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
-            }
-            attributePath = getIntent().getStringExtra("attributePath");
-            reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
-            // currentPath=getIntent().getStringExtra("currentPath");
+        }
+        //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
+        //den to eida re file ti na kanoume... kourasmenoi anthropoi eimaste....
+        classPath = getIntent().getStringExtra("classPath");
+        if (classPath == null) {
+            classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
+        }
+        attributePath = getIntent().getStringExtra("attributePath");
+        reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+        // currentPath=getIntent().getStringExtra("currentPath");
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         recursiveRecyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -100,9 +102,9 @@ public class RecursivePrint extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        if(QueryFlag) {
+        if (QueryFlag) {
             new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
-        }else{
+        } else {
             new RunEmptyQuery().execute(getIntent().getStringExtra("classPath"));
         }
     }
@@ -373,12 +375,17 @@ public class RecursivePrint extends AppCompatActivity {
                                     Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
                                     intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                                     intent.putExtra("reflectClassIndex", reflectClassIndex);
-                                    classPath = classPath.concat(":" + fieldType);
-                                    intent.putExtra("classPath", classPath);
+                                    //classPath = classPath.concat(":" + fieldType);
+                                    intent.putExtra("classPath", classPath + ":" + fieldType);
                                     if (attributePath == null) {
                                         intent.putExtra("attributePath", reflectField.getName());
                                     } else {
                                         intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
+                                    }
+                                    if (constraintsJsonData.getConstraints().isEmpty()) {
+                                        intent.putExtra("QueryFlag", false);
+                                    } else {
+                                        intent.putExtra("QueryFlag", true);
                                     }
                                     Log.i("MyRecurcivePrint", "classPath: " + classPath);
                                     Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
@@ -401,8 +408,13 @@ public class RecursivePrint extends AppCompatActivity {
                         try {
                             intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                             intent.putExtra("reflectClassIndex", reflectClassIndex);
+                            if (constraintsJsonData.getConstraints().isEmpty()) {
+                                intent.putExtra("QueryFlag", false);
+                            } else {
+                                intent.putExtra("QueryFlag", true);
+                            }
                             Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-                        } catch (JsonProcessingException e) {//why not Exception ,it can be anything
+                        } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
                         startActivity(intent);
@@ -423,6 +435,7 @@ public class RecursivePrint extends AppCompatActivity {
     public interface OnReflectClassItemClickedListener {
         void onListItemClicked(int reflectClassIndex);
     }
+
     class RunEmptyQuery extends AsyncTask<String, Void, Void> {
 
         ProgressDialog mProgressDialog;
@@ -562,6 +575,7 @@ public class RecursivePrint extends AppCompatActivity {
                                         intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
                                     }
                                     Log.i("MyRecurcivePrint", "classPath: " + classPath);
+                                    Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
                                     Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
                                     startActivity(intent);
                                 } catch (Exception ex) {
