@@ -450,7 +450,7 @@ public class RecursivePrint extends AppCompatActivity {
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
             ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-
+/*
             // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
             List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
             ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
@@ -471,8 +471,9 @@ public class RecursivePrint extends AppCompatActivity {
                     userClasses.add(reflectClass.getName());
                 }
             }
-            //end
 
+            //end
+*/
             // Building query
             Query query = db.query();
             query.constrain(db.ext().reflector().forName(params[0]));
