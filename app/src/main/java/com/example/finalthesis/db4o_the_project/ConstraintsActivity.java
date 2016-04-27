@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,38 +82,48 @@ public class ConstraintsActivity extends AppCompatActivity {
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
-                if (!myConstraints.isEmpty()) {
-                    final String[] operators = new String[]{"AND", "OR"};
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
-                    builder.setTitle("Select operator")
-                            .setItems(operators, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
-                                    constraintsJsonData.setConstraints(myConstraints);
-                                    constraintsJsonData.setOperator(which);
-                                    try {
-                                        intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
-                                        intent.putExtra("reflectClassIndex", -1);
-                                        intent.putExtra("QueryFlag",true);
-                                        Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-                                    } catch (JsonProcessingException e) {
-                                        e.printStackTrace();
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
+                    if (!myConstraints.isEmpty()) {
+                        final String[] operators = new String[]{"AND", "OR"};
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
+                        builder.setTitle("Select operator")
+                                .setItems(operators, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                                        constraintsJsonData.setConstraints(myConstraints);
+                                        constraintsJsonData.setOperator(which);
+                                        try {
+                                            intent.putExtra("className", constraintsJsonData.getConstraints().get(0).getPath().get(0));
+                                            intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                                            intent.putExtra("reflectClassIndex", -1);
+                                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                        }
+                                        startActivity(intent); //Auto einai edo giati prota prepei na epileksei o xristis ton operator
                                     }
-                                    startActivity(intent); //Auto einai edo giati prota prepei na epileksei o xristis ton operator
-                                }
-                            });
-                    builder.create().show();
-                } else {
-                    intent.putExtra("QueryFlag",false);
-                    startActivity(intent);
+                                });
+                        builder.create().show();
+                    } else {
+                        if (classPath != null) {
+                            intent.putExtra("className", classPath.split("\\.")[0]);
+                        } else {
+                            intent.putExtra("className", reflectClassName);
+                        }
+                        intent.putExtra("reflectClassIndex", -1);
+                        startActivity(intent);
+                    }
                 }
-            }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            });
+        }
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override

@@ -53,6 +53,7 @@ public class RecursivePrint extends AppCompatActivity {
     private int reflectClassIndex;
     private String classPath;
     private String attributePath;
+    private String className;
     private boolean QueryFlag;
 
     /*
@@ -65,7 +66,9 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        QueryFlag = getIntent().getBooleanExtra("QueryFlag", false);
+
+        className = getIntent().getStringExtra("className");
+
         String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
         if (jsonData != null) {
             try {
@@ -78,7 +81,7 @@ public class RecursivePrint extends AppCompatActivity {
         //den to eida re file ti na kanoume... kourasmenoi anthropoi eimaste....
         classPath = getIntent().getStringExtra("classPath");
         if (classPath == null) {
-            classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
+            classPath = className;
         }
         attributePath = getIntent().getStringExtra("attributePath");
         reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
@@ -102,11 +105,7 @@ public class RecursivePrint extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        if (QueryFlag) {
-            new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
-        } else {
-            new RunEmptyQuery().execute(getIntent().getStringExtra("classPath"));
-        }
+        new RunQuery().execute(className);
     }
 
     //Grammh 92 einai to error 8a prepei na phgainei mpros pisw
@@ -283,32 +282,33 @@ public class RecursivePrint extends AppCompatActivity {
             // Building query
             Query query = db.query();
             query.constrain(db.ext().reflector().forName(params[0]));
-            int queryOperator = constraintsJsonData.getOperator();
-            Constraint lasConstraint = null;
-            for (MyConstraint myConstraint : constraintsJsonData.getConstraints()) {
-                List<Object> s = new ArrayList<>();
-                s.addAll(myConstraint.getPath());
-                s.add(myConstraint.getValue());
-                s.add(myConstraint.getReflectFieldType());
-                s.remove(0);
-                if (lasConstraint != null) {
-                    switch (queryOperator) {
-                        case Constants.AND_OPERATOR:
-                            lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
-                            break;
-                        case Constants.OR_OPERATOR:
-                            lasConstraint = lasConstraint.or(MyQ(s, query, myConstraint.getOperator()));
-                            break;
+            if (constraintsJsonData != null) {
+                int queryOperator = constraintsJsonData.getOperator();
+                Constraint lasConstraint = null;
+                for (MyConstraint myConstraint : constraintsJsonData.getConstraints()) {
+                    List<Object> s = new ArrayList<>();
+                    s.addAll(myConstraint.getPath());
+                    s.add(myConstraint.getValue());
+                    s.add(myConstraint.getReflectFieldType());
+                    s.remove(0);
+                    if (lasConstraint != null) {
+                        switch (queryOperator) {
+                            case Constants.AND_OPERATOR:
+                                lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
+                                break;
+                            case Constants.OR_OPERATOR:
+                                lasConstraint = lasConstraint.or(MyQ(s, query, myConstraint.getOperator()));
+                                break;
+                        }
+                    } else {
+                        lasConstraint = MyQ(s, query, myConstraint.getOperator());
                     }
-                } else {
-                    lasConstraint = MyQ(s, query, myConstraint.getOperator());
                 }
             }
             // Execute query
             ObjectSet objectSet = query.execute();
             if (reflectClassIndex != -1) {
                 if (attributePath != null) {
-                    Object o = objectSet.get(reflectClassIndex);
                     printObject(findOutWhichObjectToPrint(objectSet.get(reflectClassIndex), new ArrayList<>(Arrays.asList(attributePath.split(":"))), classPathReflectClasses));
                 } else {
                     printObject(objectSet.get(reflectClassIndex));
@@ -377,6 +377,7 @@ public class RecursivePrint extends AppCompatActivity {
                             } else {
                                 try {
                                     Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
+                                    intent.putExtra("className", className);
                                     intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                                     intent.putExtra("reflectClassIndex", reflectClassIndex);
                                     //classPath = classPath.concat(":" + fieldType);
@@ -385,11 +386,6 @@ public class RecursivePrint extends AppCompatActivity {
                                         intent.putExtra("attributePath", reflectField.getName());
                                     } else {
                                         intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
-                                    }
-                                    if (constraintsJsonData.getConstraints().isEmpty()) {
-                                        intent.putExtra("QueryFlag", false);
-                                    } else {
-                                        intent.putExtra("QueryFlag", true);
                                     }
                                     Log.i("MyRecurcivePrint", "classPath: " + classPath);
                                     Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
@@ -410,13 +406,9 @@ public class RecursivePrint extends AppCompatActivity {
 
                         Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
                         try {
+                            intent.putExtra("className", className);
                             intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                             intent.putExtra("reflectClassIndex", reflectClassIndex);
-                            if (constraintsJsonData.getConstraints().isEmpty()) {
-                                intent.putExtra("QueryFlag", false);
-                            } else {
-                                intent.putExtra("QueryFlag", true);
-                            }
                             Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
@@ -438,180 +430,6 @@ public class RecursivePrint extends AppCompatActivity {
 
     public interface OnReflectClassItemClickedListener {
         void onListItemClicked(int reflectClassIndex);
-    }
-
-    class RunEmptyQuery extends AsyncTask<String, Void, Void> {
-
-        ProgressDialog mProgressDialog;
-        List<ReflectField> reflectFields;
-        List<String> valuesToPrint;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            reflectFields = new ArrayList<>();
-            userClasses = new ArrayList<>();
-            valuesToPrint = new ArrayList<>();
-            mProgressDialog = new ProgressDialog(RecursivePrint.this);
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setTitle("Loading Results");
-            mProgressDialog.setMessage("Your Results will be available as soon as possible");
-            mProgressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            //Start
-
-            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-/*
-            // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
-            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
-            ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
-            if (!classPathList.isEmpty()) {
-                allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
-            } else {
-                allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
-            }
-            for (ReflectField reflectField : allReflectFields) {
-                if (!reflectField.getFieldType().getName().contains(".Object")) {
-                    reflectFields.add(reflectField);
-                }
-            }
-
-            ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
-            for (ReflectClass reflectClass : reflectClasses) {
-                if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
-                    userClasses.add(reflectClass.getName());
-                }
-            }
-
-            //end
-*/
-            // Building query
-            Query query = db.query();
-            query.constrain(db.ext().reflector().forName(params[0]));
-            // Execute query
-            ObjectSet objectSet = query.execute();
-            if (reflectClassIndex != -1) {
-                if (attributePath != null) {
-                    List<ReflectClass> classPathReflectClasses = new ArrayList<>();
-                    for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
-                        classPathReflectClasses.add(db.ext().reflector().forName(className));
-                    }
-                    Object o = objectSet.get(reflectClassIndex);
-                    printObject(findOutWhichObjectToPrint(objectSet.get(reflectClassIndex), new ArrayList<>(Arrays.asList(attributePath.split(":"))), classPathReflectClasses));
-                } else {
-                    printObject(objectSet.get(reflectClassIndex));
-                }
-            } else {
-                printAllObjects(objectSet);
-            }
-            db.close();
-            return null;
-        }
-
-        private void printAllObjects(ObjectSet objectSet) {
-
-            for (Object o : objectSet) {
-                valuesToPrint.add(o.toString());
-            }
-        }
-
-        private void printObject(Object o) {
-            for (ReflectField reflectField : reflectFields) {
-                Object value = reflectField.get(o);
-                if (value != null) {
-                    valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
-                } else {
-                    valuesToPrint.add(reflectField.getName() + " : null");
-                }
-            }
-        }
-
-        private Object findOutWhichObjectToPrint(Object o, List<String> attributePath, List<ReflectClass> classPathReflectClasses) {
-            ReflectField reflectField = classPathReflectClasses.get(0).getDeclaredField(attributePath.get(0));
-            if (attributePath.size() == 1) {
-                return reflectField.get(o);
-            }
-            attributePath.remove(0);
-            classPathReflectClasses.remove(0);
-            return findOutWhichObjectToPrint(reflectField.get(o), attributePath, classPathReflectClasses);
-        }
-
-        @Override
-        protected void onPostExecute(Void tmpt) {
-            super.onPostExecute(tmpt);
-            //showFields(fFields);
-            if (reflectClassIndex != -1) {
-                reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnReflectFieldItemClickedListener() {
-                    @Override
-                    public void onListItemClicked(ReflectField reflectField) {
-                        // Edo tha vlepoume an einai anafora se allo antikeimeno
-                        String fieldType = reflectField.getFieldType().getName();
-                        if (userClasses.contains(fieldType)) {
-                            //Einai Anafora
-                            List<String> tempL = new ArrayList<>(Arrays.asList(classPath.split(":")));
-                            if (tempL.contains(fieldType)) {
-                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
-                                alertDialogBuilder.setTitle("You already have viewed " + fieldType);
-                                alertDialogBuilder.setMessage("You cannot view " + fieldType + " again");
-                                alertDialogBuilder.setNeutralButton("Close", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                AlertDialog alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
-                            } else {
-                                try {
-                                    Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
-                                    intent.putExtra("reflectClassIndex", reflectClassIndex);
-                                    classPath = classPath.concat(":" + fieldType);
-                                    intent.putExtra("classPath", classPath);
-                                    if (attributePath == null) {
-                                        intent.putExtra("attributePath", reflectField.getName());
-                                    } else {
-                                        intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
-                                    }
-                                    Log.i("MyRecurcivePrint", "classPath: " + classPath);
-                                    Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
-                                    Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
-                                    startActivity(intent);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                });
-                recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
-                reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
-            } else {
-                ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(valuesToPrint, new OnReflectClassItemClickedListener() {
-                    @Override
-                    public void onListItemClicked(int reflectClassIndex) {
-
-                        Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
-                        try {
-                            intent.putExtra("reflectClassIndex", reflectClassIndex);
-                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-                        } catch (JsonProcessingException e) {//why not Exception ,it can be anything
-                            e.printStackTrace();
-                        }
-                        startActivity(intent);
-                    }
-                });
-                recursiveRecyclerView.setAdapter(reflectClassesResultsRecyclerViewAdapter);
-                reflectClassesResultsRecyclerViewAdapter.notifyDataSetChanged();
-            }
-
-            mProgressDialog.dismiss();
-        }
     }
 
 }
