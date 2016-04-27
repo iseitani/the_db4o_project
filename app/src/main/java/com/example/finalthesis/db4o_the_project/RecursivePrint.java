@@ -23,7 +23,6 @@ import android.view.View;
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.query.Constraint;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
@@ -73,7 +72,7 @@ public class RecursivePrint extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
+        //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
         classPath = getIntent().getStringExtra("classPath");
         if (classPath == null) {
             classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
@@ -108,32 +107,34 @@ public class RecursivePrint extends AppCompatActivity {
     }
 
     //Grammh 92 einai to error 8a prepei na phgainei mpros pisw
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 1) {
-//            if (resultCode == AppCompatActivity.RESULT_OK) {
-//                String jsonData = data.getExtras().getString("ConstraintsJsonData");
-//                //remove the previous class
-//                try {
-//                    String tempcurrentPath = data.getStringExtra("currentPath");
-//                    StringBuffer text = new StringBuffer(tempcurrentPath);
-//                    text.replace(text.lastIndexOf(":"), text.length() - 1, "");
-//                } catch (Exception ex) {
-//                }
-//
-//                if (jsonData != null) {
-//                    try {
-//                        ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-//                        myConstraints = constraintsJsonData.getConstraints();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
-//            }
-//        }
-//    }
+   /*
+    @Override
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+               String jsonData = data.getExtras().getString("ConstraintsJsonData");
+                //remove the previous class
+                try {
+                    String tempcurrentPath = data.getStringExtra("currentPath");
+                    StringBuffer text = new StringBuffer(tempcurrentPath);
+                    text.replace(text.lastIndexOf(":"), text.length() - 1, "");
+                } catch (Exception ex) {
+                }
+
+                if (jsonData != null) {
+                    try {
+                        ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
+                        myConstraints = constraintsJsonData.getConstraints();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+               }
+                reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+            }
+        }
+    }
+    */
 
     @Override
     public void onBackPressed() {

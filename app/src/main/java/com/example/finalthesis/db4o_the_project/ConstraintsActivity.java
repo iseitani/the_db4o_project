@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsRecyclerViewAdapter;
@@ -60,19 +59,19 @@ public class ConstraintsActivity extends AppCompatActivity {
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 
-        reflectClassName = getIntent().getExtras().getString("className");
+        reflectClassName = getIntent().getStringExtra("className");
         if (reflectClassName != null) {
             new GetReflectFields().execute(reflectClassName);
         }
 
-        classPath = getIntent().getExtras().getString("classPath");
+        classPath = getIntent().getStringExtra("classPath");
         if (classPath != null) {
             setTitle(classPath + " (" + reflectClassName + ")");
         } else {
             setTitle(reflectClassName);
         }
 
-        String jsonData = getIntent().getExtras().getString("ConstraintsJsonData");
+        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
         if (jsonData != null) {
             try {
                 ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
