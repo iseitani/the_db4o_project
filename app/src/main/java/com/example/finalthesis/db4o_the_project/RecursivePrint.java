@@ -271,7 +271,15 @@ public class RecursivePrint extends AppCompatActivity {
                 }
             }
             //end
+            List<ReflectClass> classPathReflectClasses = new ArrayList<>();
+            if (reflectClassIndex != -1 && attributePath != null) {
+                for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
+                    classPathReflectClasses.add(db.ext().reflector().forName(className));
+                }
+            }
+            db.close();
 
+            db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             // Building query
             Query query = db.query();
             query.constrain(db.ext().reflector().forName(params[0]));
@@ -300,10 +308,6 @@ public class RecursivePrint extends AppCompatActivity {
             ObjectSet objectSet = query.execute();
             if (reflectClassIndex != -1) {
                 if (attributePath != null) {
-                    List<ReflectClass> classPathReflectClasses = new ArrayList<>();
-                    for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
-                        classPathReflectClasses.add(db.ext().reflector().forName(className));
-                    }
                     Object o = objectSet.get(reflectClassIndex);
                     printObject(findOutWhichObjectToPrint(objectSet.get(reflectClassIndex), new ArrayList<>(Arrays.asList(attributePath.split(":"))), classPathReflectClasses));
                 } else {
