@@ -97,6 +97,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                                         constraintsJsonData.setConstraints(myConstraints);
                                         constraintsJsonData.setOperator(which);
                                         try {
+                                            intent.putExtra("QueryFlag",true);
                                             intent.putExtra("className", constraintsJsonData.getConstraints().get(0).getPath().get(0));
                                             intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                                             intent.putExtra("reflectClassIndex", -1);
@@ -109,6 +110,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                                 });
                         builder.create().show();
                     } else {
+                        intent.putExtra("QueryFlag",true);
                         if (classPath != null) {
                             intent.putExtra("className", classPath.split("\\.")[0]);
                         } else {

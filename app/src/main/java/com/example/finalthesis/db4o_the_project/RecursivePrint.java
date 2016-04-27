@@ -24,7 +24,6 @@ import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Constraint;
-import com.db4o.query.Constraints;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
@@ -85,6 +84,7 @@ public class RecursivePrint extends AppCompatActivity {
         }
         attributePath = getIntent().getStringExtra("attributePath");
         reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+        QueryFlag=getIntent().getBooleanExtra("QueryFlag",false);
         // currentPath=getIntent().getStringExtra("currentPath");
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -353,6 +353,11 @@ public class RecursivePrint extends AppCompatActivity {
         protected void onPostExecute(Void tmpt) {
             super.onPostExecute(tmpt);
             //showFields(fFields);
+            if(QueryFlag) {
+                setTitle(getTitle() + " ( " + valuesToPrint.size() + " )");
+            }else{
+                setTitle("RecursivePrint");
+            }
             if (reflectClassIndex != -1) {
                 reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnReflectFieldItemClickedListener() {
                     @Override
