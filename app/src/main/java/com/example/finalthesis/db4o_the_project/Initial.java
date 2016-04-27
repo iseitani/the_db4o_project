@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
@@ -133,12 +135,12 @@ public class Initial extends AppCompatActivity
         ProgressDialog mProgressDialog;
 
         protected String doInBackground(Integer... params) {
-            reflectATTListSTRING = new ArrayList<String>();
+            reflectATTListSTRING = new ArrayList<>();
 
 
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
+            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
             ReflectClass rf1 = db.ext().reflector().forName(kClass);
             ReflectClass rfi = rf1.getDelegate();
             ReflectField[] fields = rfi.getDeclaredFields();
@@ -170,7 +172,7 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
-            ATTListView.setAdapter(new ArrayAdapter<String>(
+            ATTListView.setAdapter(new ArrayAdapter<>(
                     getApplication().getBaseContext(),
                     android.R.layout.simple_list_item_activated_1,
                     android.R.id.text1, reflectATTListSTRING
@@ -185,10 +187,10 @@ public class Initial extends AppCompatActivity
         ReflectClass[] sdmkd = null;
 
         protected String doInBackground(Integer... params) {
-            reflectATTListSTRING = new ArrayList<String>();
+            reflectATTListSTRING = new ArrayList<>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-           // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
+            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
             sdmkd = db.ext().reflector().knownClasses();
             db.close();
             return null;
@@ -210,7 +212,7 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
-            List<String> itemList = new ArrayList<String>();
+            List<String> itemList = new ArrayList<>();
             for (int i = 0; i < sdmkd.length / 2; i++) {
                 if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
                     knownClasses.add(sdmkd[i]);
