@@ -43,7 +43,6 @@ public class ConstraintsActivity extends AppCompatActivity {
     private List<String> userClasses;
     private List<MyConstraint> myConstraints;
     private static ObjectMapper mapper = new ObjectMapper();
-
     private static final int REQUEST_CODE = 1;
 
     @Override
@@ -85,26 +84,33 @@ public class ConstraintsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String[] operators = new String[]{"AND", "OR"};
-                AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
-                builder.setTitle("Select operator")
-                        .setItems(operators, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
-                                ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
-                                constraintsJsonData.setConstraints(myConstraints);
-                                constraintsJsonData.setOperator(which);
-                                try {
-                                    intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
-                                    intent.putExtra("reflectClassIndex", -1);
-                                    Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
-                                } catch (JsonProcessingException e) {
-                                    e.printStackTrace();
+                final Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
+                if (!myConstraints.isEmpty()) {
+                    final String[] operators = new String[]{"AND", "OR"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
+                    builder.setTitle("Select operator")
+                            .setItems(operators, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                                    constraintsJsonData.setConstraints(myConstraints);
+                                    constraintsJsonData.setOperator(which);
+                                    try {
+                                        intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
+                                        intent.putExtra("reflectClassIndex", -1);
+                                        intent.putExtra("QueryFlag",true);
+                                        Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                                    } catch (JsonProcessingException e) {
+                                        e.printStackTrace();
+                                    }
+                                    //startActivity(intent);
                                 }
-                                startActivity(intent);
-                            }
-                        });
-                builder.create().show();
+                            });
+                    builder.create().show();
+                } else {
+                        intent.putExtra("QueryFlag",false);
+                }
+                //
+                startActivity(intent);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

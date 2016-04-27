@@ -52,6 +52,7 @@ public class RecursivePrint extends AppCompatActivity {
     private int reflectClassIndex;
     private String classPath;
     private String attributePath;
+    private boolean QueryFlag;
 
     /*
       for selected fields preview, at the end of the project I will upload the class
@@ -63,26 +64,23 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
-        if (jsonData != null) {
-            try {
-                constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-            } catch (IOException e) {
-                e.printStackTrace();
+        QueryFlag=getIntent().getBooleanExtra("QueryFlag",false);
+            String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
+            if (jsonData != null) {
+                try {
+                    constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
-        classPath = getIntent().getStringExtra("classPath");
-        if (classPath == null) {
-            classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
-        }
-
-        attributePath = getIntent().getStringExtra("attributePath");
-
-        reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
-        // currentPath=getIntent().getStringExtra("currentPath");
-
+            //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
+            classPath = getIntent().getStringExtra("classPath");
+            if (classPath != null) {
+                classPath = constraintsJsonData.getConstraints().get(0).getPath().get(0);
+            }
+            attributePath = getIntent().getStringExtra("attributePath");
+            reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
+            // currentPath=getIntent().getStringExtra("currentPath");
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         recursiveRecyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -102,8 +100,11 @@ public class RecursivePrint extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
+        if(QueryFlag) {
+            new RunQuery().execute(constraintsJsonData.getConstraints().get(0).getPath().get(0));
+        }else{
+            new RunEmptyQuery().execute(getIntent().getStringExtra("classPath"));
+        }
     }
 
     //Grammh 92 einai to error 8a prepei na phgainei mpros pisw
@@ -248,8 +249,8 @@ public class RecursivePrint extends AppCompatActivity {
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
 
             // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
-            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));
-            ReflectField[] allReflectFields;
+            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
+            ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
             if (!classPathList.isEmpty()) {
                 allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
             } else {
@@ -422,4 +423,176 @@ public class RecursivePrint extends AppCompatActivity {
     public interface OnReflectClassItemClickedListener {
         void onListItemClicked(int reflectClassIndex);
     }
+    class RunEmptyQuery extends AsyncTask<String, Void, Void> {
+
+        ProgressDialog mProgressDialog;
+        List<ReflectField> reflectFields;
+        List<String> valuesToPrint;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            reflectFields = new ArrayList<>();
+            userClasses = new ArrayList<>();
+            valuesToPrint = new ArrayList<>();
+            mProgressDialog = new ProgressDialog(RecursivePrint.this);
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setTitle("Loading Results");
+            mProgressDialog.setMessage("Your Results will be available as soon as possible");
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            //Start
+
+            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
+            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
+
+            // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
+            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
+            ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
+            if (!classPathList.isEmpty()) {
+                allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
+            } else {
+                allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
+            }
+            for (ReflectField reflectField : allReflectFields) {
+                if (!reflectField.getFieldType().getName().contains(".Object")) {
+                    reflectFields.add(reflectField);
+                }
+            }
+
+            ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
+            for (ReflectClass reflectClass : reflectClasses) {
+                if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
+                    userClasses.add(reflectClass.getName());
+                }
+            }
+            //end
+
+            // Building query
+            Query query = db.query();
+            query.constrain(db.ext().reflector().forName(params[0]));
+            // Execute query
+            ObjectSet objectSet = query.execute();
+            if (reflectClassIndex != -1) {
+                if (attributePath != null) {
+                    List<ReflectClass> classPathReflectClasses = new ArrayList<>();
+                    for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
+                        classPathReflectClasses.add(db.ext().reflector().forName(className));
+                    }
+                    Object o = objectSet.get(reflectClassIndex);
+                    printObject(findOutWhichObjectToPrint(objectSet.get(reflectClassIndex), new ArrayList<>(Arrays.asList(attributePath.split(":"))), classPathReflectClasses));
+                } else {
+                    printObject(objectSet.get(reflectClassIndex));
+                }
+            } else {
+                printAllObjects(objectSet);
+            }
+            db.close();
+            return null;
+        }
+
+        private void printAllObjects(ObjectSet objectSet) {
+
+            for (Object o : objectSet) {
+                valuesToPrint.add(o.toString());
+            }
+        }
+
+        private void printObject(Object o) {
+            for (ReflectField reflectField : reflectFields) {
+                Object value = reflectField.get(o);
+                if (value != null) {
+                    valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
+                } else {
+                    valuesToPrint.add(reflectField.getName() + " : null");
+                }
+            }
+        }
+
+        private Object findOutWhichObjectToPrint(Object o, List<String> attributePath, List<ReflectClass> classPathReflectClasses) {
+            ReflectField reflectField = classPathReflectClasses.get(0).getDeclaredField(attributePath.get(0));
+            if (attributePath.size() == 1) {
+                return reflectField.get(o);
+            }
+            attributePath.remove(0);
+            classPathReflectClasses.remove(0);
+            return findOutWhichObjectToPrint(reflectField.get(o), attributePath, classPathReflectClasses);
+        }
+
+        @Override
+        protected void onPostExecute(Void tmpt) {
+            super.onPostExecute(tmpt);
+            //showFields(fFields);
+            if (reflectClassIndex != -1) {
+                reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnReflectFieldItemClickedListener() {
+                    @Override
+                    public void onListItemClicked(ReflectField reflectField) {
+                        // Edo tha vlepoume an einai anafora se allo antikeimeno
+                        String fieldType = reflectField.getFieldType().getName();
+                        if (userClasses.contains(fieldType)) {
+                            //Einai Anafora
+                            List<String> tempL = new ArrayList<>(Arrays.asList(classPath.split(":")));
+                            if (tempL.contains(fieldType)) {
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+                                alertDialogBuilder.setTitle("You already have viewed " + fieldType);
+                                alertDialogBuilder.setMessage("You cannot view " + fieldType + " again");
+                                alertDialogBuilder.setNeutralButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            } else {
+                                try {
+                                    Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
+                                    intent.putExtra("reflectClassIndex", reflectClassIndex);
+                                    classPath = classPath.concat(":" + fieldType);
+                                    intent.putExtra("classPath", classPath);
+                                    if (attributePath == null) {
+                                        intent.putExtra("attributePath", reflectField.getName());
+                                    } else {
+                                        intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
+                                    }
+                                    Log.i("MyRecurcivePrint", "classPath: " + classPath);
+                                    Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
+                                    startActivity(intent);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                });
+                recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
+                reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
+            } else {
+                ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(valuesToPrint, new OnReflectClassItemClickedListener() {
+                    @Override
+                    public void onListItemClicked(int reflectClassIndex) {
+
+                        Intent intent = new Intent(RecursivePrint.this, RecursivePrint.class);
+                        try {
+                            intent.putExtra("reflectClassIndex", reflectClassIndex);
+                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                        } catch (JsonProcessingException e) {//why not Exception ,it can be anything
+                            e.printStackTrace();
+                        }
+                        startActivity(intent);
+                    }
+                });
+                recursiveRecyclerView.setAdapter(reflectClassesResultsRecyclerViewAdapter);
+                reflectClassesResultsRecyclerViewAdapter.notifyDataSetChanged();
+            }
+
+            mProgressDialog.dismiss();
+        }
+    }
+
 }
