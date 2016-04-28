@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         if (msg == 0) {
             message = "You are authenticated!\n Press 'OK' to procced";
             title = "Correct Credentials";
-            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_APPEND);
@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         } else {
             message = "Your credentials are wrong!\n Please try again!";
             title = "Wrong Credentials";
-            alertDialogBuilder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setNeutralButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //Do Nothing
@@ -167,8 +167,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         }
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder.setMessage(message);
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        alertDialogBuilder.show();
+        //AlertDialog alertDialog = alertDialogBuilder.create();
+        //alertDialog.show();
     }
 
     /**
