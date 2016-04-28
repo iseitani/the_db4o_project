@@ -368,6 +368,7 @@ public class RecursivePrint extends AppCompatActivity {
                         // Edo tha vlepoume an einai anafora se allo antikeimeno
                         String fieldType = reflectField.getFieldType().getName();
                         if (value.equals("null")) {
+                            //TODO ALERTDIALBOX
                             Toast.makeText(RecursivePrint.this, "You cannot see a null object reference.", Toast.LENGTH_LONG).show();
                         } else if (userClasses.contains(fieldType)) {
                             //Einai Anafora
