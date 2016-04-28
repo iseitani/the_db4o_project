@@ -35,8 +35,9 @@ public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final ReflectField reflectField = reflectFields.get(position);
-        String textToShow = mValues.get(position);
-        holder.mItem = textToShow;
+        final String value = mValues.get(position);
+        holder.mItem = value;
+        String textToShow = reflectField.getName() + " : " + value;
         holder.mNameView.setText(textToShow);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +46,7 @@ public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemClicked(reflectField);
+                    mListener.onListItemClicked(value, reflectField);
                 }
             }
         });

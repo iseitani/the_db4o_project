@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
@@ -84,7 +85,7 @@ public class RecursivePrint extends AppCompatActivity {
         }
         attributePath = getIntent().getStringExtra("attributePath");
         reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
-        QueryFlag=getIntent().getBooleanExtra("QueryFlag",false);
+        QueryFlag = getIntent().getBooleanExtra("QueryFlag", false);
         // currentPath=getIntent().getStringExtra("currentPath");
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -98,13 +99,15 @@ public class RecursivePrint extends AppCompatActivity {
 
         //For XML
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
         new RunQuery().execute(className);
     }
 
@@ -142,7 +145,7 @@ public class RecursivePrint extends AppCompatActivity {
     public void onBackPressed() {
         //Oi grammes 105-106 mporoun na grafoun edw h ekei pou einai
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -225,14 +228,14 @@ public class RecursivePrint extends AppCompatActivity {
 
         ProgressDialog mProgressDialog;
         List<ReflectField> reflectFields;
-        List<String> valuesToPrint;
+        List<String> values;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             reflectFields = new ArrayList<>();
             userClasses = new ArrayList<>();
-            valuesToPrint = new ArrayList<>();
+            values = new ArrayList<>();
             mProgressDialog = new ProgressDialog(RecursivePrint.this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setTitle("Loading Results");
@@ -324,7 +327,7 @@ public class RecursivePrint extends AppCompatActivity {
             //NOT THE WHOLE OBJECT(?)
             //nop
             for (Object o : objectSet) {
-                valuesToPrint.add(o.toString());
+                values.add(o.toString());
             }
         }
 
@@ -332,9 +335,9 @@ public class RecursivePrint extends AppCompatActivity {
             for (ReflectField reflectField : reflectFields) {
                 Object value = reflectField.get(o);
                 if (value != null) {
-                    valuesToPrint.add(reflectField.getName() + " : " + reflectField.get(o).toString());
+                    values.add(value.toString());
                 } else {
-                    valuesToPrint.add(reflectField.getName() + " : null");
+                    values.add("null");
                 }
             }
         }
@@ -353,18 +356,20 @@ public class RecursivePrint extends AppCompatActivity {
         protected void onPostExecute(Void tmpt) {
             super.onPostExecute(tmpt);
             //showFields(fFields);
-            if(QueryFlag) {
-                setTitle(getTitle() + " ( " + valuesToPrint.size() + " )");
-            }else{
+            if (QueryFlag) {
+                setTitle(getTitle() + " ( " + values.size() + " )");
+            } else {
                 setTitle("RecursivePrint");
             }
             if (reflectClassIndex != -1) {
-                reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(valuesToPrint, reflectFields, new OnReflectFieldItemClickedListener() {
+                reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(values, reflectFields, new OnReflectFieldItemClickedListener() {
                     @Override
-                    public void onListItemClicked(ReflectField reflectField) {
+                    public void onListItemClicked(String value, ReflectField reflectField) {
                         // Edo tha vlepoume an einai anafora se allo antikeimeno
                         String fieldType = reflectField.getFieldType().getName();
-                        if (userClasses.contains(fieldType)) {
+                        if (value.equals("null")) {
+                            Toast.makeText(RecursivePrint.this, "You cannot see a null object reference.", Toast.LENGTH_LONG).show();
+                        } else if (userClasses.contains(fieldType)) {
                             //Einai Anafora
                             List<String> tempL = new ArrayList<>(Arrays.asList(classPath.split(":")));
                             if (tempL.contains(fieldType)) {
@@ -405,7 +410,7 @@ public class RecursivePrint extends AppCompatActivity {
                 recursiveRecyclerView.setAdapter(reflectFieldsValuesRecyclerViewAdapter);
                 reflectFieldsValuesRecyclerViewAdapter.notifyDataSetChanged();
             } else {
-                ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(valuesToPrint, new OnReflectClassItemClickedListener() {
+                ReflectClassesResultsRecyclerViewAdapter reflectClassesResultsRecyclerViewAdapter = new ReflectClassesResultsRecyclerViewAdapter(values, new OnReflectClassItemClickedListener() {
                     @Override
                     public void onListItemClicked(int reflectClassIndex) {
 
@@ -430,7 +435,7 @@ public class RecursivePrint extends AppCompatActivity {
     }
 
     public interface OnReflectFieldItemClickedListener {
-        void onListItemClicked(ReflectField reflectField);
+        void onListItemClicked(String value, ReflectField reflectField);
     }
 
     public interface OnReflectClassItemClickedListener {
