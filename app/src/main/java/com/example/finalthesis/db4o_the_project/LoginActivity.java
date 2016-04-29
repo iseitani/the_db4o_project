@@ -135,7 +135,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         final String pass = PasswordNi;
         final String serv = ServerNi;
         final int po = PortNi;
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplication());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         if (msg == 0) {
             message = "You are authenticated!\n Press 'OK' to procced";
             title = "Correct Credentials";
