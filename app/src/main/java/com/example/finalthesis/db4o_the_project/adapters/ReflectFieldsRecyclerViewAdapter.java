@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.ConstraintsActivity;
 import com.example.finalthesis.db4o_the_project.R;
-import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +43,9 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
         holder.mItem = reflectField;
         String textToShow;
         if (reflectField.getFieldType().isCollection()) {
-            textToShow = reflectField.getName() + ": " + "Collection";
+            textToShow = reflectField.getName() + " : " + "Collection";
         } else {
-            textToShow = reflectField.getName() + ": " + reflectField.getFieldType().getName();
+            textToShow = reflectField.getName() + " : " + reflectField.getFieldType().getName();
         }
         holder.mNameView.setText(textToShow);
 
@@ -85,7 +84,7 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
 
     public List<ReflectField> getSelectedItems() {
         List<ReflectField> selectedReflectFields = new ArrayList<>();
-        for (int i = 0 ; i < checkBoxArray.length ; i++) {
+        for (int i = 0; i < checkBoxArray.length; i++) {
             if (checkBoxArray[i]) {
                 selectedReflectFields.add(mValues.get(i));
             }

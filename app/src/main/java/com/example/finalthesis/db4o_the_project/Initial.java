@@ -1,10 +1,10 @@
 package com.example.finalthesis.db4o_the_project;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,11 +18,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.reflect.ReflectClass;
-import com.db4o.reflect.ReflectField;
+import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +35,8 @@ public class Initial extends AppCompatActivity
     private ListView ATTListView;
     private Menu menu;
     private String kClass = null;
-    private List<ReflectClass> knownClasses;
+    private List<String> knownClasses;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +44,8 @@ public class Initial extends AppCompatActivity
         setContentView(R.layout.activity_initial);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //preferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        ctx = this;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.proceedToQuery);
         fab.setClickable(false);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -106,8 +105,8 @@ public class Initial extends AppCompatActivity
     private void Class2Text() {
         List<String> temp = new ArrayList<String>();
         int io = 0;
-        for (int ko = 0; ko < knownClasses.size(); ko++) {
-            menu.add(knownClasses.get(ko).getName());
+        for (String s : knownClasses) {
+            menu.add(s);
         }
         onNavigationItemSelected(menu.getItem(0));
     }
@@ -139,20 +138,22 @@ public class Initial extends AppCompatActivity
 
 
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
-            ReflectClass rf1 = db.ext().reflector().forName(kClass);
-            ReflectClass rfi = rf1.getDelegate();
-            ReflectField[] fields = rfi.getDeclaredFields();
-            for (ReflectField rff : fields) {
-                if (rff.getFieldType().isCollection()) {
-                    reflectATTListSTRING.add(rff.getName() + "-->" + " isCollection");
-                } else {
-                    reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
-                }
-            }
-            db.close();
-
+            // ReflectClass rf1 = db.ext().reflector().forName(kClass);
+            // ReflectClass rfi = rf1.getDelegate();
+            // ReflectField[] fields = rfi.getDeclaredFields();
+            // for (ReflectField rff : fields) {
+            //    if (rff.getFieldType().isCollection()) {
+            //        reflectATTListSTRING.add(rff.getName() + "-->" + " isCollection");
+            //   } else {
+            //       reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
+            //   }
+            // }
+            // db.close();
+            Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
+            reflectATTListSTRING = db4oSubClass.reflectFieldsNameANDTypeListSTRING(kClass);
+            db4oSubClass.CloseDB();
             return null;
         }
 
@@ -182,17 +183,21 @@ public class Initial extends AppCompatActivity
     }
 
     private class LoadClassATTTask extends AsyncTask<Integer, String, String> {
-        List<String> reflectATTListSTRING;
+        // List<String> reflectATTListSTRING;
         ProgressDialog mProgressDialog;
         ReflectClass[] sdmkd = null;
 
         protected String doInBackground(Integer... params) {
-            reflectATTListSTRING = new ArrayList<>();
+            //  reflectATTListSTRING = new ArrayList<>();
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-            sdmkd = db.ext().reflector().knownClasses();
-            db.close();
+            //sdmkd = db.ext().reflector().knownClasses();
+            // db.close();
+            Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
+            // sdmkd= db4oSubClass.reflectClasses();
+            knownClasses = db4oSubClass.reflectClassesAsSTR();
+            db4oSubClass.CloseDB();
             return null;
         }
 
@@ -212,12 +217,14 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
-            List<String> itemList = new ArrayList<>();
+            // List<String> itemList = new ArrayList<>();
+            /*
             for (int i = 0; i < sdmkd.length / 2; i++) {
                 if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
                     knownClasses.add(sdmkd[i]);
                 }
             }
+            */
             Class2Text();
             mProgressDialog.dismiss();
         }

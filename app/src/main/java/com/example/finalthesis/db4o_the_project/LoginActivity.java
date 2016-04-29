@@ -9,15 +9,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -40,19 +39,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+    // private static final String[] DUMMY_CREDENTIALS = new String[]{
+    //       "foo@example.com:hello", "bar@example.com:world"
+    //};
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
     //Creds
-    public static final String MyPREFERENCES = "DB4OCREDS";
-    public static final String UserN = "username";
-    public static final String PasswordN = "password";
-    public static final String PortN = "port";
-    public static final String ServerN = "server";
+    //public static final String MyPREFERENCES = "DB4OCREDS";
+    //public static final String UserN = "username";
+    //public static final String PasswordN = "password";
+    //public static final String PortN = "port";
+    // public static final String ServerN = "server";
 
     // UI references.
     private AutoCompleteTextView UsernameView;
@@ -71,7 +70,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         UsernameView = (AutoCompleteTextView) findViewById(R.id.LoginUser);
         UrlView = (AutoCompleteTextView) findViewById(R.id.LoginServerUser);
         PortView = (AutoCompleteTextView) findViewById(R.id.LoginPort);
-
+        if (PortView != null) {
+            PortView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
         //leave it for later
         // populateAutoComplete();
 
@@ -97,11 +98,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //   populateAutoComplete();
-            }
-        }
+        /////  if (requestCode == REQUEST_READ_CONTACTS) {
+        //     if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        //   populateAutoComplete();
+        //     }
+        // }
     }
 
 
@@ -137,28 +138,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         final int po = PortNi;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         if (msg == 0) {
-            message = "You are authenticated!\n Press 'OK' to procced";
-            title = "Correct Credentials";
-            alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            message = getString(R.string.LoginMSGOK);
+            title = getString(R.string.LoginTitleOK);
+            alertDialogBuilder.setNeutralButton(getString(R.string.OkButton), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    SharedPreferences sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_APPEND);
+                    SharedPreferences sharedpreferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString(UserN, uis);
-                    editor.putString(PasswordN, pass);
-                    editor.putInt(PortN, po);
-                    editor.putString(ServerN, serv);
+                    editor.putString(getString(R.string.UserN), uis);
+                    editor.putString(getString(R.string.PasswordN), pass);
+                    editor.putInt(getString(R.string.PortN), po);
+                    editor.putString(getString(R.string.ServerN), serv);
                     editor.commit();
                     //Go the Main Activity
-                     Intent intent = new Intent(LoginActivity.this,Initial.class);
-                     startActivity(intent);
+                    Intent intent = new Intent(LoginActivity.this, Initial.class);
+                    startActivity(intent);
                 }
                 //
             });
         } else {
-            message = "Your credentials are wrong!\n Please try again!";
-            title = "Wrong Credentials";
-            alertDialogBuilder.setNeutralButton("Try Again", new DialogInterface.OnClickListener() {
+            message = getString(R.string.LoginMSGNAK);
+            title = getString(R.string.LoginTitleNAK);
+            alertDialogBuilder.setNeutralButton(getString(R.string.TryAgainButton), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //Do Nothing
@@ -245,7 +246,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     }
 
-
+/*
     private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -255,6 +256,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
+*/
 
     /**
      * Represents an asynchronous login/registration task used to authenticate

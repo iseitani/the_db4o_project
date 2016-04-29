@@ -2,11 +2,11 @@ package com.example.finalthesis.db4o_the_project;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -21,8 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Constraint;
 import com.db4o.query.Query;
@@ -31,6 +29,7 @@ import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectClassesResultsRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsValuesRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
+import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 import com.example.finalthesis.db4o_the_project.views.DividerItemDecoration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,6 +54,7 @@ public class RecursivePrint extends AppCompatActivity {
     private String attributePath;
     private String className;
     private boolean QueryFlag;
+    private Context ctx;
 
     /*
       for selected fields preview, at the end of the project I will upload the class
@@ -66,7 +66,8 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //preferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        ctx = this;
         className = getIntent().getStringExtra("className");
 
         String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
@@ -174,7 +175,7 @@ public class RecursivePrint extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private Object correctGeorgesBugs(Object value, Object type) {
+    private Object correctTypeConverter(Object value, Object type) {
         Object temp = null;
 
         switch (type.toString()) {
@@ -183,6 +184,21 @@ public class RecursivePrint extends AppCompatActivity {
                 break;
             case ReflectMTypes.INT:
                 temp = Integer.parseInt(value.toString());
+                break;
+            case ReflectMTypes.BOOLEAN:
+                temp = Boolean.parseBoolean(value.toString());
+                break;
+            case ReflectMTypes.BYTE:
+                temp = Byte.parseByte(value.toString());
+                break;
+            case ReflectMTypes.DOUBLE:
+                temp = Double.parseDouble(value.toString());
+                break;
+            case ReflectMTypes.LONG:
+                temp = Long.parseLong(value.toString());
+                break;
+            case ReflectMTypes.SHORT:
+                temp = Short.parseShort(value.toString());
                 break;
             default:
                 temp = value;
@@ -203,13 +219,13 @@ public class RecursivePrint extends AppCompatActivity {
         if (s.size() == 2) {
             switch (operator) {
                 case Constants.GREATER_OPERATOR:
-                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1))).greater();
+                    return q.constrain(correctTypeConverter(s.get(0), s.get(1))).greater();
                 case Constants.SMALLER_OPERATOR:
-                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1))).smaller();
+                    return q.constrain(correctTypeConverter(s.get(0), s.get(1))).smaller();
                 case Constants.LIKE_OPERATOR:
                     return q.constrain(s.get(0)).like();
                 case Constants.EQUALS_OPERATOR:
-                    return q.constrain(correctGeorgesBugs(s.get(0), s.get(1)));
+                    return q.constrain(correctTypeConverter(s.get(0), s.get(1)));
               /* Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
               ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
               */
@@ -247,44 +263,53 @@ public class RecursivePrint extends AppCompatActivity {
         protected Void doInBackground(String... params) {
 
             //Start
-
+            Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
             // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
 
             // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
             List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
-            ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
+            // ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
             if (!classPathList.isEmpty()) {
-                allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
+                reflectFields = db4oSubClass.reflectFieldsNameASRF(classPathList.get(classPathList.size() - 1));
+                //allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
             } else {
-                allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
+                reflectFields = db4oSubClass.reflectFieldsNameASRF(params[0]);
+                // allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
             }
+            /*
             for (ReflectField reflectField : allReflectFields) {
                 if (!reflectField.getFieldType().getName().contains(".Object")) {
                     reflectFields.add(reflectField);
                 }
             }
-
+             */
+            /*
             ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
             for (ReflectClass reflectClass : reflectClasses) {
                 if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
                     userClasses.add(reflectClass.getName());
                 }
             }
+            */
+            userClasses = db4oSubClass.reflectClassesAsSTR();
             //end
             List<ReflectClass> classPathReflectClasses = new ArrayList<>();
             if (reflectClassIndex != -1 && attributePath != null) {
                 for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
-                    classPathReflectClasses.add(db.ext().reflector().forName(className));
+                    classPathReflectClasses.add(db4oSubClass.reflectClass(className));
+                    //classPathReflectClasses.add(db.ext().reflector().forName(className));
                 }
             }
-            db.close();
-
-            db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            //db.close();
+            db4oSubClass.CloseDB();
+            db4oSubClass = new Db4oSubClass(ctx);
+            //db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             // Building query
-            Query query = db.query();
-            query.constrain(db.ext().reflector().forName(params[0]));
+            Query query = db4oSubClass.getDb().query();
+            //query.constrain(db.ext().reflector().forName(params[0]));
+            query.constrain(db4oSubClass.reflectClass(params[0]));
             if (constraintsJsonData != null) {
                 int queryOperator = constraintsJsonData.getOperator();
                 Constraint lasConstraint = null;
@@ -319,7 +344,8 @@ public class RecursivePrint extends AppCompatActivity {
             } else {
                 printAllObjects(objectSet);
             }
-            db.close();
+            db4oSubClass.CloseDB();
+            //db.close();
             return null;
         }
 

@@ -8,7 +8,9 @@
     <string name="title_activity_constraints">ConstraintsActivity</string>
     <string name="title_activity_recursive_print">RecursivePrint</string>
     <string name="title_activity_login">Connect2DB</string>
-
+    <string name="Initial_app_barString">Query Selected Class</string>
+    <string name="Dialog_ConstraintEditText">Value</string>
+    <string name="AppEmail">db4oAndroid@gmail.com</string>
     <!-- Strings related to login -->
     <string name="prompt_user">Username</string>
     <string name="prompt_password">Password</string>
@@ -16,6 +18,37 @@
     <string name="prompt_server">URL or IP of the DB4O Server</string>
     <string name="action_sign_in">Try and Connect to DB4O Server</string>
     <string name="title_activity_login2">Login2</string>
+    <string name="MyPREFERENCES">DB4OCREDS</string>
+    <string name="UserN">username</string>
+    <string name="PasswordN">password</string>
+    <string name="PortN">port</string>
+    <string name="ServerN">server</string>
+    <string name="ARG_REFLECT_FIELD_NAME">reflectFieldName</string>
+    <string name="ARG_REFLECT_FIELD_TYPE">reflectFieldType</string>
+    <string name="ARG_REFLECT_CLASS_NAME">reflectClassName</string>
+    <string name="FALSE">False</string>
+    <string name="TRUE">True</string>
+    <string name="Loading">Loading....</string>
+    <string name="Equals">Equals</string>
+    <string name="EqualsSign"> = </string>
+    <string name="Date1">java.util.Date</string>
+    <string name="Date2">java.sql.Date</string>
+    <string name="SaveButton">Save</string>
+    <string name="CancelButton">Cancel</string>
+    <string name="CLASS_NAME">className</string>
+    <string name="CLASS_PATH">classPath</string>
+    <string name="ConsJSOND">ConstraintsJsonData</string>
+    <string name="ConstraintsCollectionMSG">Constraints in collections and arrays are not supported</string>
+    <string name="Dot">.</string>
+    <string name="ConstraintAdded">Constraint added at field </string>
+    <string name="constraintDialog">constraintDialog</string>
+    <string name="ConstraintFragmentTitle">Constraint for field: </string>
+    <string name="LoginMSGOK">You are authenticated!\n Press 'OK' to procced</string>
+    <string name="OkButton">OK</string>
+    <string name="TryAgainButton">Try Again</string>
+    <string name="LoginTitleOK">Correct Credentials</string>
+    <string name="LoginTitleNAK">Wrong Credentials</string>
+    <string name="LoginMSGNAK">Your credentials are wrong!\n Please try again!</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

@@ -1,10 +1,10 @@
 package com.example.finalthesis.db4o_the_project.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
@@ -22,15 +22,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
-import com.db4o.cs.Db4oClientServer;
 import com.db4o.query.Query;
 import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.Constants;
 import com.example.finalthesis.db4o_the_project.R;
+import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 
 public class ConstraintDialogFragment extends DialogFragment {
 
@@ -47,7 +45,7 @@ public class ConstraintDialogFragment extends DialogFragment {
     private boolean isBoolean = false;
     private static OnSaveButtonClickedListener mOnSaveButtonClickedListener;
     private AlertDialog mAlertDialog;
-
+    private Context ctx;
     private String[] fieldValues;
 
     private static final String[] numbersOperators = new String[6];
@@ -95,6 +93,7 @@ public class ConstraintDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ctx = getActivity();
         if (getArguments() != null) {
             reflectFieldName = getArguments().getString(ARG_REFLECT_FIELD_NAME);
             reflectFieldType = getArguments().getString(ARG_REFLECT_FIELD_TYPE);
@@ -110,8 +109,8 @@ public class ConstraintDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_constraint, ((ViewGroup) getView()));
-        builder.setTitle("Constraint for field: " + reflectFieldName)
-                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        builder.setTitle(getString(R.string.ConstraintFragmentTitle) + reflectFieldName)
+                .setPositiveButton(getString(R.string.SaveButton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (mOnSaveButtonClickedListener != null) {
                             int operator;
@@ -151,7 +150,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                         dismiss();
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.CancelButton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dismiss();
                     }
@@ -207,7 +206,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                 break;
             default:
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, numbersOperators);
-                if (reflectFieldType.equals("java.util.Date") || reflectFieldType.equals("java.sql.Date")) {
+                if (reflectFieldType.equals(getString(R.string.Date1)) || reflectFieldType.equals(getString(R.string.Date2))) {
                     valueEditText.setInputType(InputType.TYPE_CLASS_DATETIME);
                 } else {
                     int type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
@@ -221,11 +220,11 @@ public class ConstraintDialogFragment extends DialogFragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedOperator = parent.getItemAtPosition(position).toString();
-                if (selectedOperator.equals("=") || selectedOperator.equals("Equals")) {
+                if (selectedOperator.equals(getString(R.string.EqualsSign)) || selectedOperator.equals(getString(R.string.Equals))) {
                     valueTextInputLayout.setVisibility(View.INVISIBLE);
                     valueSpinner.setVisibility(View.VISIBLE);
                     if (isBoolean) {
-                        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{"true", "false"});
+                        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.TRUE), getString(R.string.FALSE)});
                         valueSpinner.setAdapter(adapter);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     } else {
@@ -265,7 +264,7 @@ public class ConstraintDialogFragment extends DialogFragment {
         if (mAlertDialog != null) {
             Button positiveButton = mAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
             if (((valueEditText.getText().length() > 0 && valueTextInputLayout.getVisibility() == View.VISIBLE) ||
-                    (valueSpinner.getSelectedItem() != null && !valueSpinner.getSelectedItem().toString().equals("Loading....") && valueSpinner.getVisibility() == View.VISIBLE)) &&
+                    (valueSpinner.getSelectedItem() != null && !valueSpinner.getSelectedItem().toString().equals(getString(R.string.Loading)) && valueSpinner.getVisibility() == View.VISIBLE)) &&
                     operatorSpinner.getSelectedItemPosition() != 0) {
                 positiveButton.setEnabled(true);
             } else {
@@ -285,28 +284,32 @@ public class ConstraintDialogFragment extends DialogFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{"Loading...."});
+            ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.Loading)});
             valueSpinner.setAdapter(adapter);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         }
 
         protected Void doInBackground(Void... params) {
 
+            Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
+
             //Start
-            ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
+            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
             //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-            ReflectClass reflectClass = db.ext().reflector().forName(reflectClassName);
+            ReflectClass reflectClass = db4oSubClass.reflectClass(reflectClassName);
+            //TODO
             ReflectField reflectField = reflectClass.getDeclaredField(reflectFieldName);
 
             //End
-            Query query = db.query();
+            Query query = db4oSubClass.getDb().query();
             query.constrain(reflectClass);
             ObjectSet result = query.execute();
             fieldValues = new String[result.size()];
             for (int i = 0; i < result.size(); i++) {
                 fieldValues[i] = reflectField.get(result.get(i)).toString();
             }
-            db.close();
+            db4oSubClass.CloseDB();
+            //db.close();
             return null;
         }
 
