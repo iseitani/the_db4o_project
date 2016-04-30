@@ -44,8 +44,10 @@ public class Db4oSubClass {
     public List<ReflectClass> reflectClassesASREFC() {
         List<ReflectClass> knownClasses = new ArrayList<>();
         ReflectClass[] sdmkd = reflectClasses();
-        for (int i = 0; i < sdmkd.length / 2; i++) {
-            if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
+        for (int i = 0; i < sdmkd.length; i++) {
+            //Autos o elegxos einai epidi i vasi epistrefei pano apo mia fores tin kathe klasi
+            //ALLA OXI PANTA ME TIN IDIA SEIRA periergos
+            if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.") && !knownClasses.contains(sdmkd[i])) {
                 knownClasses.add(sdmkd[i]);
             }
         }

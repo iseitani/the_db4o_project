@@ -43,7 +43,7 @@
     <string name="ConstraintAdded">Constraint added at field </string>
     <string name="constraintDialog">constraintDialog</string>
     <string name="ConstraintFragmentTitle">Constraint for field: </string>
-    <string name="LoginMSGOK">You are authenticated!\n Press 'OK' to procced</string>
+    <string name="LoginMSGOK">You are authenticated!\n Press OK to procced</string>
     <string name="OkButton">OK</string>
     <string name="TryAgainButton">Try Again</string>
     <string name="LoginTitleOK">Correct Credentials</string>
