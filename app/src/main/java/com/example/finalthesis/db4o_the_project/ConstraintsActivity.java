@@ -87,7 +87,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     final Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
-                    if (!myConstraints.isEmpty()) {
+                    if (!(myConstraints.isEmpty()||myConstraints.size()==1)) {
                         final String[] operators = new String[]{"AND", "OR"};
                         AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
                         builder.setTitle("Select operator")
