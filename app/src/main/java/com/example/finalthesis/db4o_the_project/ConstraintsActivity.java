@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -127,7 +129,12 @@ public class ConstraintsActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.recursive_print, menu);
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -136,6 +143,17 @@ public class ConstraintsActivity extends AppCompatActivity {
                 //NavUtils.navigateUpFromSameTask(this);
                 onBackPressed();
             }
+            return true;
+        }
+        if (id == R.id.logout) {
+            Intent intent = new Intent( this, LoginActivity.class );
+            intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.FAQ) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.FAQ)));
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

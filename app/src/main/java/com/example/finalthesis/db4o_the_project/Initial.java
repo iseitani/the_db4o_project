@@ -3,6 +3,7 @@ package com.example.finalthesis.db4o_the_project;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -95,7 +96,15 @@ public class Initial extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logout) {
+            Intent intent = new Intent( this, LoginActivity.class );
+            intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.FAQ) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.FAQ)));
+            startActivity(intent);
             return true;
         }
 

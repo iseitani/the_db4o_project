@@ -95,6 +95,15 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/FAQ_TEXT"
+                android:id="@+id/FAQB"
+                android:enabled="true"
+                android:layout_gravity="center"/>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

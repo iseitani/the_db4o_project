@@ -49,6 +49,9 @@
     <string name="LoginTitleOK">Correct Credentials</string>
     <string name="LoginTitleNAK">Wrong Credentials</string>
     <string name="LoginMSGNAK">Your credentials are wrong!\n Please try again!</string>
+    <string name="LOGOUT">Log out</string>
+    <string name="FAQ">https://docs.google.com/presentation/d/1iEsmRAgO_lc95wKDXJLNV7-hWqKTTaL1eGN2Ds1n1k0/edit?usp=sharing</string>
+    <string name="FAQ_TEXT">Quick Tutorial</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

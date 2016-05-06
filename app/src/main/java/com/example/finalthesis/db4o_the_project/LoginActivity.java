@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -61,6 +62,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     private View mProgressView;
     private View mLoginFormView;
     private Button Conn;
+    private Button FAQ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +79,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         // populateAutoComplete();
 
         PasswordView = (EditText) findViewById(R.id.LoginPassword);
-
-
+        FAQ=(Button)findViewById(R.id.FAQB);
+        FAQ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.FAQ)));
+                    startActivity(intent);
+            }
+        });
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
