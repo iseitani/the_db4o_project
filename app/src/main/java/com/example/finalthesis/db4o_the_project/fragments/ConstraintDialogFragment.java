@@ -12,7 +12,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +98,7 @@ public class ConstraintDialogFragment extends DialogFragment {
             reflectFieldType = getArguments().getString(ARG_REFLECT_FIELD_TYPE);
             reflectClassName = getArguments().getString(ARG_REFLECT_CLASS_NAME);
         }
-        Log.i("MyConstraintDialog", "Field name: " + reflectFieldName + " Field type: " + reflectFieldType);
+        //Log.i("MyConstraintDialog", "Field name: " + reflectFieldName + " Field type: " + reflectFieldType);
     }
 
     @NonNull
@@ -143,7 +142,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                                 value = valueEditText.getText().toString();
                             } else {
                                 value = valueSpinner.getSelectedItem().toString();
-                                Log.i("MyConstraintDialog", valueSpinner.getSelectedItem().toString());
+                                //Log.i("MyConstraintDialog", valueSpinner.getSelectedItem().toString());
                             }
                             mOnSaveButtonClickedListener.onSaveButtonClicked(value, operator);
                         }
@@ -292,15 +291,10 @@ public class ConstraintDialogFragment extends DialogFragment {
         protected Void doInBackground(Void... params) {
 
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
-
-            //Start
-            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
             ReflectClass reflectClass = db4oSubClass.reflectClass(reflectClassName);
             //TODO
             ReflectField reflectField = reflectClass.getDeclaredField(reflectFieldName);
 
-            //End
             Query query = db4oSubClass.getDb().query();
             query.constrain(reflectClass);
             ObjectSet result = query.execute();
@@ -309,7 +303,6 @@ public class ConstraintDialogFragment extends DialogFragment {
                 fieldValues[i] = reflectField.get(result.get(i)).toString();
             }
             db4oSubClass.CloseDB();
-            //db.close();
             return null;
         }
 

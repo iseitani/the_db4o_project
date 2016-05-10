@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,7 +66,6 @@ public class RecursivePrint extends AppCompatActivity {
         setContentView(R.layout.activity_recursive_print);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //preferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         ctx = this;
         className = getIntent().getStringExtra("className");
 
@@ -79,8 +77,7 @@ public class RecursivePrint extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        //LIGES GRAMMES PIO KATW DEN EIDES TO VARIABLE???? ESY LES META MHN DHMIOYRGOUME AXRHSTA VARIABLES
-        //den to eida re file ti na kanoume... kourasmenoi anthropoi eimaste....
+
         classPath = getIntent().getStringExtra("classPath");
         if (classPath == null) {
             classPath = className;
@@ -88,7 +85,6 @@ public class RecursivePrint extends AppCompatActivity {
         attributePath = getIntent().getStringExtra("attributePath");
         reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
         QueryFlag = getIntent().getBooleanExtra("QueryFlag", false);
-        // currentPath=getIntent().getStringExtra("currentPath");
         recursiveRecyclerView = (RecyclerView) findViewById(R.id.recursiveprintRecyclerView);
         recursiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         recursiveRecyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -113,39 +109,8 @@ public class RecursivePrint extends AppCompatActivity {
         new RunQuery().execute(className);
     }
 
-    //Grammh 92 einai to error 8a prepei na phgainei mpros pisw
-   /*
-    @Override
-
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-               String jsonData = data.getExtras().getString("ConstraintsJsonData");
-                //remove the previous class
-                try {
-                    String tempcurrentPath = data.getStringExtra("currentPath");
-                    StringBuffer text = new StringBuffer(tempcurrentPath);
-                    text.replace(text.lastIndexOf(":"), text.length() - 1, "");
-                } catch (Exception ex) {
-                }
-
-                if (jsonData != null) {
-                    try {
-                        ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-                        myConstraints = constraintsJsonData.getConstraints();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-               }
-                reflectClassIndex = getIntent().getIntExtra("reflectClassIndex", -1);
-            }
-        }
-    }
-    */
-
     @Override
     public void onBackPressed() {
-        //Oi grammes 105-106 mporoun na grafoun edw h ekei pou einai
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -211,15 +176,7 @@ public class RecursivePrint extends AppCompatActivity {
             default:
                 temp = value;
         }
-        /*
-        if (type.toString().equalsIgnoreCase(ReflectMTypes.INT)) {
-            temp = Integer.parseInt(value.toString());
-        } else if (type.toString().equalsIgnoreCase(ReflectMTypes.FLOAT)) {
-            temp = Float.parseFloat(value.toString());
-        } else {
-            temp = value;
-        }
-        */
+
         return temp;
     }
 
@@ -234,9 +191,6 @@ public class RecursivePrint extends AppCompatActivity {
                     return q.constrain(s.get(0)).like();
                 case Constants.EQUALS_OPERATOR:
                     return q.constrain(correctTypeConverter(s.get(0), s.get(1)));
-              /* Edo einai mia endiaferousa prosthiki gia tous operators ">=" kai "<="
-              ostoso mporei na dimiourgithoun provlimata me ta and kai or (tha to suzitisoume)
-              */
                 case Constants.GREATER_EQUALS_OPERATOR:
                     return MyQ(s, q, Constants.GREATER_OPERATOR).or(MyQ(s, q, Constants.EQUALS_OPERATOR));
                 case Constants.SMALLER_EQUALS_OPERATOR:
@@ -270,53 +224,25 @@ public class RecursivePrint extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... params) {
 
-            //Start
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
-            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-
             // Edo apofasizoume poia ReflectField xreiazomaste gia na emfanisooume to object
-            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));//attributePath h classpath????? TO IDIO KOMMATI KWDIKA YPHRXE PIO PANW
-            // ReflectField[] allReflectFields;//ANTI GIA ARRAY ISWS LISTA
+            List<String> classPathList = new ArrayList<>(Arrays.asList(classPath.split(":")));
             if (!classPathList.isEmpty()) {
                 reflectFields = db4oSubClass.reflectFieldsNameASRF(classPathList.get(classPathList.size() - 1));
-                //allReflectFields = db.ext().reflector().forName(classPathList.get(classPathList.size() - 1)).getDelegate().getDeclaredFields();
             } else {
                 reflectFields = db4oSubClass.reflectFieldsNameASRF(params[0]);
-                // allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
             }
-            /*
-            for (ReflectField reflectField : allReflectFields) {
-                if (!reflectField.getFieldType().getName().contains(".Object")) {
-                    reflectFields.add(reflectField);
-                }
-            }
-             */
-            /*
-            ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
-            for (ReflectClass reflectClass : reflectClasses) {
-                if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
-                    userClasses.add(reflectClass.getName());
-                }
-            }
-            */
             userClasses = db4oSubClass.reflectClassesAsSTR();
-            //end
             List<ReflectClass> classPathReflectClasses = new ArrayList<>();
             if (reflectClassIndex != -1 && attributePath != null) {
                 for (String className : new ArrayList<>(Arrays.asList(classPath.split(":")))) {
                     classPathReflectClasses.add(db4oSubClass.reflectClass(className));
-                    //classPathReflectClasses.add(db.ext().reflector().forName(className));
                 }
             }
-            //db.close();
             db4oSubClass.CloseDB();
             db4oSubClass = new Db4oSubClass(ctx);
-            //db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            // Building query
+             // Building query
             Query query = db4oSubClass.getDb().query();
-            //query.constrain(db.ext().reflector().forName(params[0]));
             query.constrain(db4oSubClass.reflectClass(params[0]));
             if (constraintsJsonData != null) {
                 int queryOperator = constraintsJsonData.getOperator();
@@ -353,13 +279,10 @@ public class RecursivePrint extends AppCompatActivity {
                 printAllObjects(objectSet);
             }
             db4oSubClass.CloseDB();
-            //db.close();
             return null;
         }
 
         private void printAllObjects(ObjectSet objectSet) {
-            //NOT THE WHOLE OBJECT(?)
-            //nop
             for (Object o : objectSet) {
                 values.add(o.toString());
             }
@@ -389,7 +312,6 @@ public class RecursivePrint extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void tmpt) {
             super.onPostExecute(tmpt);
-            //showFields(fFields);
             if (QueryFlag) {
                 setTitle(getTitle() + " ( " + values.size() + " )");
             } else {
@@ -399,13 +321,11 @@ public class RecursivePrint extends AppCompatActivity {
                 reflectFieldsValuesRecyclerViewAdapter = new ReflectFieldsValuesRecyclerViewAdapter(values, reflectFields, new OnReflectFieldItemClickedListener() {
                     @Override
                     public void onListItemClicked(String value, ReflectField reflectField) {
-                        // Edo tha vlepoume an einai anafora se allo antikeimeno
                         String fieldType = reflectField.getFieldType().getName();
                         if (value.equals("null")) {
                             //TODO ALERTDIALBOX
                             Toast.makeText(RecursivePrint.this, "You cannot see a null object reference.", Toast.LENGTH_LONG).show();
                         } else if (userClasses.contains(fieldType)) {
-                            //Einai Anafora
                             List<String> tempL = new ArrayList<>(Arrays.asList(classPath.split(":")));
                             if (tempL.contains(fieldType)) {
                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
@@ -425,15 +345,14 @@ public class RecursivePrint extends AppCompatActivity {
                                     intent.putExtra("className", className);
                                     intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                                     intent.putExtra("reflectClassIndex", reflectClassIndex);
-                                    //classPath = classPath.concat(":" + fieldType);
                                     intent.putExtra("classPath", classPath + ":" + fieldType);
                                     if (attributePath == null) {
                                         intent.putExtra("attributePath", reflectField.getName());
                                     } else {
                                         intent.putExtra("attributePath", attributePath + ":" + reflectField.getName());
                                     }
-                                    Log.i("MyRecurcivePrint", "classPath: " + classPath);
-                                    Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
+                                  //  Log.i("MyRecurcivePrint", "classPath: " + classPath);
+                                   // Log.i("MyRecurcivePrint", "attributePath: " + attributePath);
                                     startActivity(intent);
                                 } catch (JsonProcessingException e) {
                                     e.printStackTrace();
@@ -454,7 +373,7 @@ public class RecursivePrint extends AppCompatActivity {
                             intent.putExtra("className", className);
                             intent.putExtra("ConstraintsJsonData", mapper.writeValueAsString(constraintsJsonData));
                             intent.putExtra("reflectClassIndex", reflectClassIndex);
-                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                           // Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
