@@ -44,7 +44,6 @@ public class ConstraintsActivity extends AppCompatActivity {
     private List<String> userClasses;
     private List<MyConstraint> myConstraints;
     private static ObjectMapper mapper = new ObjectMapper();
-    private static final int REQUEST_CODE = 1;
     private Context ctx;
 
     @Override
@@ -54,14 +53,13 @@ public class ConstraintsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ctx = this;
-        // preferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         userClasses = new ArrayList<>();
-        myConstraints = new ArrayList<>();
+        myConstraints = new ArrayList<>();//8
         reflectFieldsRecyclerView = (RecyclerView) findViewById(R.id.reflectFieldsRecyclerView);
         reflectFieldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reflectFieldsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 
-        reflectClassName = getIntent().getStringExtra(getString(R.string.CLASS_NAME));
+        reflectClassName = getIntent().getStringExtra(getString(R.string.CLASS_NAME));//12
         if (reflectClassName != null) {
             new GetReflectFields().execute(reflectClassName);
         }
@@ -73,7 +71,7 @@ public class ConstraintsActivity extends AppCompatActivity {
             setTitle(reflectClassName);
         }
 
-        String jsonData = getIntent().getStringExtra(getString(R.string.ConsJSOND));
+        String jsonData = getIntent().getStringExtra(getString(R.string.ConsJSOND));//22
         if (jsonData != null) {
             try {
                 ConstraintsJsonData constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
@@ -83,7 +81,7 @@ public class ConstraintsActivity extends AppCompatActivity {
             }
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);//31
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -103,7 +101,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                                             intent.putExtra(getString(R.string.CLASS_NAME), constraintsJsonData.getConstraints().get(0).getPath().get(0));
                                             intent.putExtra(getString(R.string.ConsJSOND), mapper.writeValueAsString(constraintsJsonData));
                                             intent.putExtra("reflectClassIndex", -1);
-                                            Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                                            //Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
                                         } catch (JsonProcessingException e) {
                                             e.printStackTrace();
                                         }
@@ -122,7 +120,7 @@ public class ConstraintsActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 }
-            });
+            });//66
         }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -161,7 +159,6 @@ public class ConstraintsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
         ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
         constraintsJsonData.setConstraints(myConstraints);
         Intent intent = new Intent();
@@ -178,7 +175,7 @@ public class ConstraintsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == Constants.REQUEST_CODE) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 String jsonData = data.getExtras().getString(getString(R.string.ConsJSOND));
                 if (jsonData != null) {
@@ -211,11 +208,11 @@ public class ConstraintsActivity extends AppCompatActivity {
                         ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
                         constraintsJsonData.setConstraints(myConstraints);
                         intent.putExtra(getString(R.string.ConsJSOND), mapper.writeValueAsString(constraintsJsonData));
-                        Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                        //Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-                    startActivityForResult(intent, REQUEST_CODE);
+                    startActivityForResult(intent, Constants.REQUEST_CODE);
                 } else {
                     ConstraintDialogFragment constraintDialogFragment = ConstraintDialogFragment.newInstance(reflectField.getName(),
                             reflectField.getFieldType().getName(), reflectClassName, new ConstraintDialogFragment.OnSaveButtonClickedListener() {
@@ -284,27 +281,6 @@ public class ConstraintsActivity extends AppCompatActivity {
 
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
             reflectFields = db4oSubClass.reflectFieldsNameASRF(params[0]);
-            //Start
-            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-
-            // ReflectField[] allReflectFields = db.ext().reflector().forName(params[0]).getDelegate().getDeclaredFields();
-            // for (ReflectField reflectField : allReflectFields) {
-            //     if (!reflectField.getFieldType().getName().contains(".Object")) {
-            //         reflectFields.add(reflectField);
-            //     }
-            // }
-            /*
-            ReflectClass[] reflectClasses = db.ext().reflector().knownClasses();
-            for (ReflectClass reflectClass : reflectClasses) {
-                if (!reflectClass.toString().contains("com.") && !reflectClass.toString().contains("java.")) {
-                    userClasses.add(reflectClass.getName());
-                }
-            }
-            db.close();
-
-            */
             userClasses = db4oSubClass.reflectClassesAsSTR();
             db4oSubClass.CloseDB();
             return null;

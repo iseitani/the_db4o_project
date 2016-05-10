@@ -13,4 +13,6 @@ public class Constants {
     //AND|OR OPERATOR
     public static final int AND_OPERATOR = 0;
     public static final int OR_OPERATOR = 1;
+
+    public static final int REQUEST_CODE = 1;
 }
