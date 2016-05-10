@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     /**
      * Id to identity READ_CONTACTS permission request.
      */
-    private static final int REQUEST_READ_CONTACTS = 0;
+   // private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -47,13 +47,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
-    //Creds
-    //public static final String MyPREFERENCES = "DB4OCREDS";
-    //public static final String UserN = "username";
-    //public static final String PasswordN = "password";
-    //public static final String PortN = "port";
-    // public static final String ServerN = "server";
-
     // UI references.
     private AutoCompleteTextView UsernameView;
     private AutoCompleteTextView UrlView;
@@ -61,7 +54,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     private EditText PasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private Button Conn;
     private Button FAQ;
 
     @Override
@@ -72,14 +64,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         UsernameView = (AutoCompleteTextView) findViewById(R.id.LoginUser);
         UrlView = (AutoCompleteTextView) findViewById(R.id.LoginServerUser);
         PortView = (AutoCompleteTextView) findViewById(R.id.LoginPort);
-        if (PortView != null) {
-            PortView.setInputType(InputType.TYPE_CLASS_NUMBER);
-        }
-        //leave it for later
-        // populateAutoComplete();
-
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
         PasswordView = (EditText) findViewById(R.id.LoginPassword);
         FAQ=(Button)findViewById(R.id.FAQB);
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        //12
+       // if (PortView != null) {
+            PortView.setInputType(InputType.TYPE_CLASS_NUMBER);
+       // }
         FAQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,16 +80,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                     startActivity(intent);
             }
         });
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
 
@@ -130,7 +119,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         int port = Integer.parseInt(PortView.getText().toString());
         // Show a progress spinner, and kick off a background task to
         // perform the user login attempt.
-        showProgress(true);
+        showProgress(true);//9
         mAuthTask = new UserLoginTask(username, password, url, port);
         mAuthTask.execute((Void) null);
 
@@ -143,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         final String uis = UserNi;
         final String pass = PasswordNi;
         final String serv = ServerNi;
-        final int po = PortNi;
+        final int po = PortNi;//7
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         if (msg == 0) {
             message = getString(R.string.LoginMSGOK);

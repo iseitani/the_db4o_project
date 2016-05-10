@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.db4o.reflect.ReflectClass;
 import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 
 import java.util.ArrayList;
@@ -27,12 +26,6 @@ import java.util.List;
 
 public class Initial extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    /*MHN TA DIAGRAPSEIS
-    private String host=null;
-    private int port=0;
-    private String username=null;
-    private String password=null;
-    */
     private ListView ATTListView;
     private Menu menu;
     private String kClass = null;
@@ -45,7 +38,6 @@ public class Initial extends AppCompatActivity
         setContentView(R.layout.activity_initial);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //preferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         ctx = this;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.proceedToQuery);
         fab.setClickable(false);
@@ -56,7 +48,7 @@ public class Initial extends AppCompatActivity
                 x.putExtra("className", kClass);
                 startActivity(x);
             }
-        });
+        });//13
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -67,7 +59,7 @@ public class Initial extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         menu = navigationView.getMenu();
         knownClasses = new ArrayList<>();
-        new LoadClassATTTask().execute();
+        new LoadClassATTTask().execute();//23
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -112,8 +104,6 @@ public class Initial extends AppCompatActivity
     }
 
     private void Class2Text() {
-        List<String> temp = new ArrayList<String>();
-        int io = 0;
         for (String s : knownClasses) {
             menu.add(s);
         }
@@ -143,23 +133,6 @@ public class Initial extends AppCompatActivity
         ProgressDialog mProgressDialog;
 
         protected String doInBackground(Integer... params) {
-            reflectATTListSTRING = new ArrayList<>();
-
-
-            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            // ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.1.3", 4000, "olympic", "olympic");
-            // ReflectClass rf1 = db.ext().reflector().forName(kClass);
-            // ReflectClass rfi = rf1.getDelegate();
-            // ReflectField[] fields = rfi.getDeclaredFields();
-            // for (ReflectField rff : fields) {
-            //    if (rff.getFieldType().isCollection()) {
-            //        reflectATTListSTRING.add(rff.getName() + "-->" + " isCollection");
-            //   } else {
-            //       reflectATTListSTRING.add(rff.getName() + "-->" + rff.getFieldType().getName());
-            //   }
-            // }
-            // db.close();
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
             reflectATTListSTRING = db4oSubClass.reflectFieldsNameANDTypeListSTRING(kClass);
             db4oSubClass.CloseDB();
@@ -169,15 +142,12 @@ public class Initial extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            reflectATTListSTRING = new ArrayList<>();
             mProgressDialog = new ProgressDialog(Initial.this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setTitle("Loading Fields ");
             mProgressDialog.setMessage("Searching for the required Fields");
             mProgressDialog.show();
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-
         }
 
         @Override
@@ -192,19 +162,10 @@ public class Initial extends AppCompatActivity
     }
 
     private class LoadClassATTTask extends AsyncTask<Integer, String, String> {
-        // List<String> reflectATTListSTRING;
         ProgressDialog mProgressDialog;
-        ReflectClass[] sdmkd = null;
 
         protected String doInBackground(Integer... params) {
-            //  reflectATTListSTRING = new ArrayList<>();
-            // ObjectContainer db =db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), host, port, username, password);
-            //ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/nosqlOLYMPIC.db4o");
-            //ObjectContainer db = Db4oClientServer.openClient(Db4oClientServer.newClientConfiguration(), "192.168.2.2", 4000, "olympic", "olympic");
-            //sdmkd = db.ext().reflector().knownClasses();
-            // db.close();
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
-            // sdmkd= db4oSubClass.reflectClasses();
             knownClasses = db4oSubClass.reflectClassesAsSTR();
             db4oSubClass.CloseDB();
             return null;
@@ -220,20 +181,8 @@ public class Initial extends AppCompatActivity
             mProgressDialog.show();
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-
-        }
-
         @Override
         protected void onPostExecute(String t) {
-            // List<String> itemList = new ArrayList<>();
-            /*
-            for (int i = 0; i < sdmkd.length / 2; i++) {
-                if (!sdmkd[i].toString().contains("com.") && !sdmkd[i].toString().contains("java.")) {
-                    knownClasses.add(sdmkd[i]);
-                }
-            }
-            */
             Class2Text();
             mProgressDialog.dismiss();
         }

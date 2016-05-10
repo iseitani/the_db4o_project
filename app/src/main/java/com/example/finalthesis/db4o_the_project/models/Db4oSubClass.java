@@ -74,9 +74,9 @@ public class Db4oSubClass {
         List<String> reflectFields = new ArrayList<>();
 
         for (ReflectField reflectField : reflectFieldsNameASRF(className)) {
-            if (!reflectField.getFieldType().getName().contains(".Object")) {
+          //  if (!reflectField.getFieldType().getName().contains(".Object")) {
                 reflectFields.add(reflectField.getName());
-            }
+           // }
         }
         return reflectFields;
     }
