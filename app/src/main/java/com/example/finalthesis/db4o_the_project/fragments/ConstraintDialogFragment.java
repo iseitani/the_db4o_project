@@ -38,7 +38,8 @@ public class ConstraintDialogFragment extends DialogFragment {
     private String reflectFieldName;
     private String reflectFieldType;
     private String reflectClassName;
-    private Spinner valueSpinner, operatorSpinner;
+    private Spinner operatorSpinner;
+    private Spinner valueSpinner;//9
     private EditText valueEditText;
     private TextInputLayout valueTextInputLayout;
     private boolean isBoolean = false;
@@ -92,12 +93,6 @@ public class ConstraintDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ctx = getActivity();
-        if (getArguments() != null) {
-            reflectFieldName = getArguments().getString(ARG_REFLECT_FIELD_NAME);
-            reflectFieldType = getArguments().getString(ARG_REFLECT_FIELD_TYPE);
-            reflectClassName = getArguments().getString(ARG_REFLECT_CLASS_NAME);
-        }
         //Log.i("MyConstraintDialog", "Field name: " + reflectFieldName + " Field type: " + reflectFieldType);
     }
 
@@ -105,6 +100,12 @@ public class ConstraintDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
+        ctx = getActivity();
+        if (getArguments() != null) {
+            reflectFieldName = getArguments().getString(ARG_REFLECT_FIELD_NAME);
+            reflectFieldType = getArguments().getString(ARG_REFLECT_FIELD_TYPE);
+            reflectClassName = getArguments().getString(ARG_REFLECT_CLASS_NAME);
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_constraint, ((ViewGroup) getView()));
