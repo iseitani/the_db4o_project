@@ -40,7 +40,7 @@ public class ConstraintDialogFragment extends DialogFragment {
     private String reflectFieldType;
     private String reflectClassName;
     private Spinner operatorSpinner;
-    private Spinner valueSpinner;//9
+    private Spinner valueSpinner;
     private EditText valueEditText;
     private TextInputLayout valueTextInputLayout;
     private boolean isBoolean = false;
@@ -61,7 +61,6 @@ public class ConstraintDialogFragment extends DialogFragment {
 
     }
 
-    //Na dw operators gia String & CHAR
     private static final String[] stringOperators = new String[3];
 
     static {
@@ -194,20 +193,20 @@ public class ConstraintDialogFragment extends DialogFragment {
 
         ArrayAdapter adapter;
         switch (reflectFieldType) {
-            case "java.lang.String":
+            case ReflectMTypes.STRING:
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, stringOperators);
                 valueEditText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 break;
-            case "boolean":
+            case ReflectMTypes.BOOLEAN:
                 isBoolean = true;
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, charOrBooleanOperators);
                 break;
-            case "char"://11
+            case ReflectMTypes.CHAR:
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, charOrBooleanOperators);
                 break;
             default:
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, numbersOperators);
-                if (reflectFieldType.equals(getString(R.string.Date1)) || reflectFieldType.equals(getString(R.string.Date2))) {
+                if (reflectFieldType.equals(ReflectMTypes.UTILDATE) || reflectFieldType.equals(ReflectMTypes.SQLDATE)) {
                     valueEditText.setInputType(InputType.TYPE_CLASS_DATETIME);
                 } else {
                     int type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
@@ -216,7 +215,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                 break;
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        operatorSpinner.setAdapter(adapter);//25
+        operatorSpinner.setAdapter(adapter);
         operatorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -243,13 +242,13 @@ public class ConstraintDialogFragment extends DialogFragment {
                     valueSpinner.setVisibility(View.INVISIBLE);
                 }
                 shouldPositiveButtonEnabled();
-            }//26
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });//30
+        });
 
         // Create the AlertDialog object and return it
         mAlertDialog = builder.create();
