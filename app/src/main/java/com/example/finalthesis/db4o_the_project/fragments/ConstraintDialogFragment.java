@@ -27,6 +27,7 @@ import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.Constants;
 import com.example.finalthesis.db4o_the_project.R;
+import com.example.finalthesis.db4o_the_project.ReflectMTypes;
 import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 
 public class ConstraintDialogFragment extends DialogFragment {
@@ -201,7 +202,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                 isBoolean = true;
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, charOrBooleanOperators);
                 break;
-            case "char":
+            case "char"://11
                 adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, charOrBooleanOperators);
                 break;
             default:
@@ -215,39 +216,40 @@ public class ConstraintDialogFragment extends DialogFragment {
                 break;
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        operatorSpinner.setAdapter(adapter);
+        operatorSpinner.setAdapter(adapter);//25
         operatorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedOperator = parent.getItemAtPosition(position).toString();
-                if (selectedOperator.equals(getString(R.string.EqualsSign)) || selectedOperator.equals(getString(R.string.Equals))) {
+                if ((selectedOperator.equals(getString(R.string.EqualsSign)) || selectedOperator.equals(getString(R.string.Equals))) && (reflectFieldType.equalsIgnoreCase(ReflectMTypes.STRING) || reflectFieldType.equalsIgnoreCase(ReflectMTypes.CHAR))) {
                     valueTextInputLayout.setVisibility(View.INVISIBLE);
                     valueSpinner.setVisibility(View.VISIBLE);
-                    if (isBoolean) {
-                        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.TRUE), getString(R.string.FALSE)});
+
+                    if (fieldValues == null) {
+                        new LoadFieldValues().execute();
+                    } else {
+                        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, fieldValues);
                         valueSpinner.setAdapter(adapter);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    } else {
-                        if (fieldValues == null) {
-                            new LoadFieldValues().execute();
-                        } else {
-                            ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, fieldValues);
-                            valueSpinner.setAdapter(adapter);
-                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        }
                     }
+                } else if (isBoolean) {
+                    valueTextInputLayout.setVisibility(View.INVISIBLE);
+                    valueSpinner.setVisibility(View.VISIBLE);
+                    ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.TRUE), getString(R.string.FALSE)});
+                    valueSpinner.setAdapter(adapter);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 } else {
                     valueTextInputLayout.setVisibility(View.VISIBLE);
                     valueSpinner.setVisibility(View.INVISIBLE);
                 }
                 shouldPositiveButtonEnabled();
-            }
+            }//26
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });
+        });//30
 
         // Create the AlertDialog object and return it
         mAlertDialog = builder.create();
@@ -293,7 +295,6 @@ public class ConstraintDialogFragment extends DialogFragment {
 
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
             ReflectClass reflectClass = db4oSubClass.reflectClass(reflectClassName);
-            //TODO
             ReflectField reflectField = reflectClass.getDeclaredField(reflectFieldName);
 
             Query query = db4oSubClass.getDb().query();
