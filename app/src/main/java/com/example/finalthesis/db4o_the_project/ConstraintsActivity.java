@@ -87,7 +87,21 @@ public class ConstraintsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     final Intent intent = new Intent(ConstraintsActivity.this, RecursivePrint.class);
-                    if (!(myConstraints.isEmpty()||myConstraints.size()==1)) {
+                    if (myConstraints.size() == 1) {
+                        ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                        constraintsJsonData.setConstraints(myConstraints);
+                        constraintsJsonData.setOperator(0);
+                        try {
+                            intent.putExtra("QueryFlag", true);
+                            intent.putExtra(getString(R.string.CLASS_NAME), constraintsJsonData.getConstraints().get(0).getPath().get(0));
+                            intent.putExtra(getString(R.string.ConsJSOND), mapper.writeValueAsString(constraintsJsonData));
+                            intent.putExtra("reflectClassIndex", -1);
+                            //Log.i("MyConstraintsActivity", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraintsJsonData));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                        startActivity(intent);
+                    } else if (!myConstraints.isEmpty()) {
                         final String[] operators = new String[]{"AND", "OR"};
                         AlertDialog.Builder builder = new AlertDialog.Builder(ConstraintsActivity.this);
                         builder.setTitle("Select operator")
@@ -127,12 +141,14 @@ public class ConstraintsActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.recursive_print, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -144,8 +160,8 @@ public class ConstraintsActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.logout) {
-            Intent intent = new Intent( this, LoginActivity.class );
-            intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;
         }

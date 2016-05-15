@@ -66,7 +66,7 @@ public class ConstraintDialogFragment extends DialogFragment {
     static {
         stringOperators[0] = "Select operator";
         stringOperators[1] = "Equals";
-        stringOperators[2] = "Like";
+        stringOperators[2] = "Contains";
     }
 
     private static final String[] charOrBooleanOperators = new String[2];

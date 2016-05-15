@@ -247,7 +247,7 @@ public class RecursivePrint extends AppCompatActivity {
                     s.add(myConstraint.getValue());
                     s.add(myConstraint.getReflectFieldType());
                     s.remove(0);
-                    if (lasConstraint != null) {
+                    if ((lasConstraint != null)||(queryOperator==-1)) {
                         switch (queryOperator) {
                             case Constants.AND_OPERATOR:
                                 lasConstraint = lasConstraint.and(MyQ(s, query, myConstraint.getOperator()));
