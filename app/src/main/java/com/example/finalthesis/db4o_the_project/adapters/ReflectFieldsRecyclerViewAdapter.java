@@ -72,8 +72,10 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
         });
         if (hasConstraint[position]) {
             holder.mView.setBackgroundColor(Color.YELLOW);
+            holder.mNameView.setTextColor(Color.BLACK);
         } else {
             holder.mView.setBackgroundColor(Color.TRANSPARENT);
+            holder.mNameView.setTextColor(Color.WHITE);
         }
     }
 

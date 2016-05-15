@@ -262,7 +262,6 @@ public class RecursivePrint extends AppCompatActivity {
                 }
             }
             ObjectSet objectSet = query.execute();
-            db4oSubClass.CloseDB();
             if (reflectClassIndex != -1) {
                 if (attributePath != null) {
                     printObject(findOutWhichObjectToPrint(objectSet.get(reflectClassIndex), new ArrayList<>(Arrays.asList(attributePath.split(":"))), classPathReflectClasses));
@@ -272,6 +271,7 @@ public class RecursivePrint extends AppCompatActivity {
             } else {
                 printAllObjects(objectSet);
             }
+            db4oSubClass.CloseDB();
             return null;
         }
 
