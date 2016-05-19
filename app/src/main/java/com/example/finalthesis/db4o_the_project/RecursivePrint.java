@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -105,6 +106,11 @@ public class RecursivePrint extends AppCompatActivity {
         }
         */
         new RunQuery().execute(className);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -130,6 +136,14 @@ public class RecursivePrint extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            if (!super.onOptionsItemSelected(item)) {
+                //NavUtils.navigateUpFromSameTask(this);
+                onBackPressed();
+            }
+            return true;
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {

@@ -13,7 +13,7 @@
         layout="@layout/app_bar_recursive_print"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+<!--
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -22,5 +22,5 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_recursive_print"
         app:menu="@menu/activity_recursive_print_drawer" />
-
+-->
 </android.support.v4.widget.DrawerLayout>
