@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.db4o.reflect.ReflectField;
@@ -60,14 +59,14 @@ public class ReflectFieldsValuesRecyclerViewAdapter extends RecyclerView.Adapter
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mNameView;
-        public final ImageView mImageView;
+      //  public final ImageView mImageView;
         public String mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mNameView = (TextView) view.findViewById(R.id.itemName);
-            mImageView = (ImageView) view.findViewById(R.id.itemImage);
+            //mImageView = (ImageView) view.findViewById(R.id.itemImage);
         }
 
         @Override

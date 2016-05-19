@@ -4,10 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.R;
 import com.example.finalthesis.db4o_the_project.RecursivePrint;
 
@@ -29,12 +27,12 @@ public class ReflectClassesResultsRecyclerViewAdapter extends RecyclerView.Adapt
                 .inflate(R.layout.recursive_field_item, parent, false);
         return new ViewHolder(view);
     }
-
+//----------------------------------
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         String textToShow = mValues.get(position);
-        holder.mItem = textToShow;
-        holder.mNameView.setText(textToShow);
+        holder.mItem = textToShow;//deixnei to epilegmeno antikeimeno
+        holder.mNameView.setText(textToShow);//probalei to antikeimeno pou 8es na emfaniseis
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,14 +54,12 @@ public class ReflectClassesResultsRecyclerViewAdapter extends RecyclerView.Adapt
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mNameView;
-        public final ImageView mImageView;
         public String mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mNameView = (TextView) view.findViewById(R.id.itemName);
-            mImageView = (ImageView) view.findViewById(R.id.itemImage);
         }
 
         @Override
