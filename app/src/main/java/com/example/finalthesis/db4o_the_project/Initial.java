@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsListViewAdapter;
 import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 
 import java.util.ArrayList;
@@ -151,11 +152,13 @@ public class Initial extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String t) {
-            ATTListView.setAdapter(new ArrayAdapter<>(
-                    getApplication().getBaseContext(),
-                    android.R.layout.simple_list_item_activated_1,
-                    android.R.id.text1, reflectATTListSTRING
-            ));
+            ATTListView.setAdapter(new ReflectFieldsListViewAdapter(Initial.this, reflectATTListSTRING, knownClasses));
+
+//            ATTListView.setAdapter(new ArrayAdapter<>(
+//                    getApplication().getBaseContext(),
+//                    android.R.layout.simple_list_item_activated_1,
+//                    android.R.id.text1, reflectATTListSTRING
+//            ));
             mProgressDialog.dismiss();
         }
 

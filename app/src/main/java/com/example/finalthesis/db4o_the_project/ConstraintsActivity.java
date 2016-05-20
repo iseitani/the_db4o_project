@@ -225,7 +225,7 @@ public class ConstraintsActivity extends AppCompatActivity {
     }
 
     private void showReflectFields(List<ReflectField> reflectFields) {
-        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, new OnListItemLongClickedListener() {
+        reflectFieldsRecyclerViewAdapter = new ReflectFieldsRecyclerViewAdapter(reflectFields, userClasses, new OnListItemLongClickedListener() {
             @Override
             public void onListItemLongClicked(final ReflectField reflectField) {
                 if (reflectField.getFieldType().isCollection() || reflectField.getFieldType().isArray()) {

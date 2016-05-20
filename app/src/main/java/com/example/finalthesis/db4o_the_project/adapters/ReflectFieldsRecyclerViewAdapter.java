@@ -2,6 +2,7 @@ package com.example.finalthesis.db4o_the_project.adapters;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +19,13 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
     private final List<ReflectField> mValues;
     //private boolean[] checkBoxArray;
     private boolean[] hasConstraint;
+    private List<String> userClasses;
     private final ConstraintsActivity.OnListItemLongClickedListener mListener;
 
-    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, ConstraintsActivity.OnListItemLongClickedListener listener) {
+    public ReflectFieldsRecyclerViewAdapter(List<ReflectField> items, List<String> userClasses, ConstraintsActivity.OnListItemLongClickedListener listener) {
         mValues = items;
         mListener = listener;
+        this.userClasses = userClasses;
         //checkBoxArray = new boolean[mValues.size()];
         hasConstraint = new boolean[mValues.size()];
     }
@@ -41,10 +44,16 @@ public class ReflectFieldsRecyclerViewAdapter extends RecyclerView.Adapter<Refle
         String textToShow;
         if (reflectField.getFieldType().isCollection()) {
             textToShow = reflectField.getName() + " : " + "Collection";
+            holder.mNameView.setText(textToShow);
         } else {
-            textToShow = reflectField.getName() + " : " + reflectField.getFieldType().getName();
+            if (userClasses.contains(reflectField.getFieldType().getName())) {
+                textToShow = reflectField.getName() + " : <font color='#8bc34a'>" + reflectField.getFieldType().getName() + "</font>";
+                holder.mNameView.setText(Html.fromHtml(textToShow));
+            } else {
+                textToShow = reflectField.getName() + " : " + reflectField.getFieldType().getName();
+                holder.mNameView.setText(textToShow);
+            }
         }
-        holder.mNameView.setText(textToShow);
           /*
         holder.mCheckedView.setTag(reflectField);
         holder.mCheckedView.setOnClickListener(new View.OnClickListener() {
