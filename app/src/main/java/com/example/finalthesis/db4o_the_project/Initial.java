@@ -131,7 +131,6 @@ public class Initial extends AppCompatActivity
     private class LoadObjectsATTTask extends AsyncTask<Integer, String, String> {
         List<String> reflectATTListSTRING;
         ProgressDialog mProgressDialog;
-
         protected String doInBackground(Integer... params) {
             Db4oSubClass db4oSubClass = new Db4oSubClass(ctx);
             reflectATTListSTRING = db4oSubClass.reflectFieldsNameANDTypeListSTRING(kClass);
@@ -159,6 +158,8 @@ public class Initial extends AppCompatActivity
             ));
             mProgressDialog.dismiss();
         }
+
+
     }
 
     private class LoadClassATTTask extends AsyncTask<Integer, String, String> {

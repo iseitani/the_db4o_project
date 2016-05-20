@@ -1,7 +1,5 @@
 package com.example.finalthesis.db4o_the_project.fragments;
 
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -116,14 +114,12 @@ public class WatchMyConstraints extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId()-1;
-        //int id=item.getOrder();
-         //MyConstraint tmpCon=myConstraints.get(id);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        //fillData(id);
         WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
         tmpView.loadData(fillData(id), "text/html", null);
         tmpView.invokeZoomPicker();
+        tmpView.getSettings().setBuiltInZoomControls(true);
         tmpView.reload();
         return true;
     }
@@ -271,179 +267,4 @@ public class WatchMyConstraints extends AppCompatActivity
         return tmpOperator;
     }
 
-    private class LoadDataWebTask extends AsyncTask<Integer, String, String> {
-        String tmp=null;
-        ProgressDialog mProgressDialog;
-
-        protected String doInBackground(Integer... params) {
-            tmp=fillData(params[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
-            tmpView.loadData(tmp, "text/html", null);
-            tmpView.getSettings().setBuiltInZoomControls(true);
-            tmpView.getSettings().setSupportZoom(true);
-            tmpView.reload();
-            mProgressDialog = new ProgressDialog(WatchMyConstraints.this);
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setTitle("Loading.... ");
-            mProgressDialog.setMessage("Loading Constraints");
-            mProgressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(String t) {
-            WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
-            tmpView.loadData(tmp, "text/html", null);
-            tmpView.reload();
-            mProgressDialog.dismiss();
-        }
-        private String fillData(int position){
-            MyConstraint tmpCon=myConstraints.get(position);
-            String css_content="/*Now the CSS*/\n" +
-                    "* {margin: 0; padding: 0;}\n" +
-                    "\n" +
-                    ".tree ul {\n" +
-                    "\tpadding-top: 20px; position: relative;\n" +
-                    "\t\n" +
-                    "\ttransition: all 0.5s;\n" +
-                    "\t-webkit-transition: all 0.5s;\n" +
-                    "\t-moz-transition: all 0.5s;\n" +
-                    "}\n" +
-                    "\n" +
-                    ".tree li {\n" +
-                    "\tfloat: left; text-align: center;\n" +
-                    "\tlist-style-type: none;\n" +
-                    "\tposition: relative;\n" +
-                    "\tpadding: 20px 5px 0 5px;\n" +
-                    "\t\n" +
-                    "\ttransition: all 0.5s;\n" +
-                    "\t-webkit-transition: all 0.5s;\n" +
-                    "\t-moz-transition: all 0.5s;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*We will use ::before and ::after to draw the connectors*/\n" +
-                    "\n" +
-                    ".tree li::before, .tree li::after{\n" +
-                    "\tcontent: '';\n" +
-                    "\tposition: absolute; top: 0; right: 50%;\n" +
-                    "\tborder-top: 1px solid #ccc;\n" +
-                    "\twidth: 50%; height: 20px;\n" +
-                    "}\n" +
-                    ".tree li::after{\n" +
-                    "\tright: auto; left: 50%;\n" +
-                    "\tborder-left: 1px solid #ccc;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*We need to remove left-right connectors from elements without \n" +
-                    "any siblings*/\n" +
-                    ".tree li:only-child::after, .tree li:only-child::before {\n" +
-                    "\tdisplay: none;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*Remove space from the top of single children*/\n" +
-                    ".tree li:only-child{ padding-top: 0;}\n" +
-                    "\n" +
-                    "/*Remove left connector from first child and \n" +
-                    "right connector from last child*/\n" +
-                    ".tree li:first-child::before, .tree li:last-child::after{\n" +
-                    "\tborder: 0 none;\n" +
-                    "}\n" +
-                    "/*Adding back the vertical connector to the last nodes*/\n" +
-                    ".tree li:last-child::before{\n" +
-                    "\tborder-right: 1px solid #ccc;\n" +
-                    "\tborder-radius: 0 5px 0 0;\n" +
-                    "\t-webkit-border-radius: 0 5px 0 0;\n" +
-                    "\t-moz-border-radius: 0 5px 0 0;\n" +
-                    "}\n" +
-                    ".tree li:first-child::after{\n" +
-                    "\tborder-radius: 5px 0 0 0;\n" +
-                    "\t-webkit-border-radius: 5px 0 0 0;\n" +
-                    "\t-moz-border-radius: 5px 0 0 0;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*Time to add downward connectors from parents*/\n" +
-                    ".tree ul ul::before{\n" +
-                    "\tcontent: '';\n" +
-                    "\tposition: absolute; top: 0; left: 50%;\n" +
-                    "\tborder-left: 1px solid #ccc;\n" +
-                    "\twidth: 0; height: 20px;\n" +
-                    "}\n" +
-                    "\n" +
-                    ".tree li a{\n" +
-                    "\tborder: 1px solid #ccc;\n" +
-                    "\tpadding: 5px 10px;\n" +
-                    "\ttext-decoration: none;\n" +
-                    "\tcolor: #666;\n" +
-                    "\tfont-family: arial, verdana, tahoma;\n" +
-                    "\tfont-size: 11px;\n" +
-                    "\tdisplay: inline-block;\n" +
-                    "\t\n" +
-                    "\tborder-radius: 5px;\n" +
-                    "\t-webkit-border-radius: 5px;\n" +
-                    "\t-moz-border-radius: 5px;\n" +
-                    "\t\n" +
-                    "\ttransition: all 0.5s;\n" +
-                    "\t-webkit-transition: all 0.5s;\n" +
-                    "\t-moz-transition: all 0.5s;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*Time for some hover effects*/\n" +
-                    "/*We will apply the hover effect the the lineage of the element also*/\n" +
-                    ".tree li a:hover, .tree li a:hover+ul li a {\n" +
-                    "\tbackground: #c8e4f8; color: #000; border: 1px solid #94a0b4;\n" +
-                    "}\n" +
-                    "/*Connector styles on hover*/\n" +
-                    ".tree li a:hover+ul li::after, \n" +
-                    ".tree li a:hover+ul li::before, \n" +
-                    ".tree li a:hover+ul::before, \n" +
-                    ".tree li a:hover+ul ul::before{\n" +
-                    "\tborder-color:  #94a0b4;\n" +
-                    "}\n" +
-                    "\n" +
-                    "/*Thats all. I hope you enjoyed it.\n" +
-                    "Thanks :)*/";
-            String css="<style>"+css_content+"</style>";
-            int size=tmpCon.getPath().size();
-            String tmp="<html>"+css+"<body><div class=\"tree\">";
-            for (int i=0;i<size-1;i++) {
-                tmp += "<ul><li><a href=\"#\">"+tmpCon.getPath().get(i)+"</a>";
-            }
-            tmp+="<ul><li><a href=\"#\">"+tmpCon.getPath().get(size-1)+addOperator(tmpCon.getOperator())+tmpCon.getValue()+"</a>";
-            for(int i1=0; i1<size;i1++){
-                tmp+="</li></ul>";
-            }
-            tmp+="</div></body></html>";
-            return tmp;
-        }
-
-        private String addOperator(int operator){
-            String tmpOperator=null;
-            switch (operator) {
-                case Constants.GREATER_OPERATOR:
-                    tmpOperator=" > ";
-                    break;
-                case Constants.SMALLER_OPERATOR:
-                    tmpOperator=" < ";
-                    break;
-                case Constants.LIKE_OPERATOR:
-                    tmpOperator=" LIKE ";
-                    break;
-                case Constants.EQUALS_OPERATOR:
-                    tmpOperator=" = ";
-                    break;
-                case Constants.GREATER_EQUALS_OPERATOR:
-                    tmpOperator=" >= ";
-                    break;
-                case Constants.SMALLER_EQUALS_OPERATOR:
-                    tmpOperator=" <= ";
-                    break;
-            }
-            return tmpOperator;
-        }
-    }
 }
