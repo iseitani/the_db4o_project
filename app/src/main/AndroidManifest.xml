@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -61,7 +61,11 @@
         <activity
             android:name=".fragments.WatchMyConstraints"
             android:label="@string/title_activity_watch_my_constraints"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".Splash"
+            android:noHistory="true">
+
+        </activity>
     </application>
 
 </manifest>

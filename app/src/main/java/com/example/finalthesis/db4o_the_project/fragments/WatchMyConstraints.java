@@ -18,14 +18,11 @@ import com.example.finalthesis.db4o_the_project.models.MyConstraint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.List;
 
-public class WatchMyConstraints extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class WatchMyConstraints extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private ConstraintsJsonData constraintsJsonData;
     private static ObjectMapper mapper = new ObjectMapper();
-    private List<MyConstraint> myConstraints;
     private Menu menu;
 
     @Override
@@ -46,16 +43,15 @@ public class WatchMyConstraints extends AppCompatActivity
          */
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_viewQ);
         menu = navigationView.getMenu();
-        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");
+        String jsonData = getIntent().getStringExtra("ConstraintsJsonData");//8
         if (jsonData != null) {
             try {
                 constraintsJsonData = mapper.readValue(jsonData, ConstraintsJsonData.class);
-                myConstraints=constraintsJsonData.getConstraints();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }//14
         }
-        fillList();
+        fillList();//16
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -64,13 +60,13 @@ public class WatchMyConstraints extends AppCompatActivity
         toggle.syncState();
 
        // NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);//23
     }
 
     private void fillList(){
         menu.clear();
         int counter=1;
-        for (MyConstraint myConstraint : myConstraints) {
+        for (MyConstraint myConstraint : constraintsJsonData.getConstraints()) {
            menu.add(Menu.NONE,counter,Menu.NONE,getString(R.string.Constraint)+counter);
             counter++;
         }
@@ -124,7 +120,7 @@ public class WatchMyConstraints extends AppCompatActivity
         return true;
     }
     private String fillData(int position){
-        MyConstraint tmpCon=myConstraints.get(position);
+        MyConstraint tmpCon=constraintsJsonData.getConstraints().get(position);
         String css_content="/*Now the CSS*/\n" +
                 "* {margin: 0; padding: 0;}\n" +
                 "\n" +
@@ -227,17 +223,17 @@ public class WatchMyConstraints extends AppCompatActivity
                 "}\n" +
                 "\n" +
                 "/*Thats all. I hope you enjoyed it.\n" +
-                "Thanks :)*/";
+                "Thanks :)*/";//
         String css="<style>"+css_content+"</style>";
-        int size=tmpCon.getPath().size();
+        int size=tmpCon.getPath().size();//4
         String tmp="<html>"+css+"<body><div class=\"tree\">";
-        for (int i=0;i<size-1;i++) {
+        for (int i=0;i<size-1;i++) {//6
             tmp += "<ul><li><a href=\"#\">"+tmpCon.getPath().get(i)+"</a>";
-        }
+        }//8
         tmp+="<ul><li><a href=\"#\">"+tmpCon.getPath().get(size-1)+addOperator(tmpCon.getOperator())+tmpCon.getValue()+"</a>";
-        for(int i1=0; i1<size;i1++){
+        for(int i1=0; i1<size;i1++){//10
             tmp+="</li></ul>";
-        }
+        }//12
         tmp+="</div></body></html>";
         return tmp;
     }
