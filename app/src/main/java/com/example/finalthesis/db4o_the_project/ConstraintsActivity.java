@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.fragments.ConstraintDialogFragment;
+import com.example.finalthesis.db4o_the_project.fragments.WatchMyConstraints;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
 import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
@@ -169,6 +170,23 @@ public class ConstraintsActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.FAQ)));
             startActivity(intent);
             return true;
+        }
+
+        if (id == R.id.MyConsT) {
+            if (myConstraints.isEmpty()) {
+                Toast.makeText(ConstraintsActivity.this,"No Constraints", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                    constraintsJsonData.setConstraints(myConstraints);
+                    Intent intent = new Intent(ConstraintsActivity.this, WatchMyConstraints.class);
+                    intent.putExtra(getString(R.string.ConsJSOND), mapper.writeValueAsString(constraintsJsonData));
+                    startActivity(intent);
+                    return true;
+                } catch (Exception ex) {
+
+                }
+            }
         }
         return super.onOptionsItemSelected(item);
     }

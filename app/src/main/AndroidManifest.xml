@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.finalthesis.db4o_the_project">
-    <uses-sdk android:minSdkVersion="12"/>
+
+    <uses-sdk android:minSdkVersion="12" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -11,6 +13,8 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_2"
@@ -19,41 +23,45 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".Initial"
+            android:configChanges="orientation"
             android:label="@string/app_name"
-            android:parentActivityName=".LoginActivity"
-            android:configChanges="orientation">
+            android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.finalthesis.db4o_the_project.LoginActivity" />
         </activity>
         <activity
             android:name=".ConstraintsActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_constraints"
-            android:parentActivityName=".Initial"
-            android:configChanges="orientation">
+            android:parentActivityName=".Initial">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.finalthesis.db4o_the_project.Initial" />
         </activity>
         <activity
             android:name=".RecursivePrint"
+            android:configChanges="orientation"
             android:label="@string/title_activity_recursive_print"
-            android:parentActivityName=".ConstraintsActivity"
-            android:configChanges="orientation">
+            android:parentActivityName=".ConstraintsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.finalthesis.db4o_the_project.ConstraintsActivity" />
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation">
+            android:configChanges="orientation"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".fragments.WatchMyConstraints"
+            android:label="@string/title_activity_watch_my_constraints"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

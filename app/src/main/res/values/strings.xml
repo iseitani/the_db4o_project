@@ -52,6 +52,7 @@
     <string name="LOGOUT">Log out</string>
     <string name="FAQ">https://docs.google.com/presentation/d/1iEsmRAgO_lc95wKDXJLNV7-hWqKTTaL1eGN2Ds1n1k0/edit?usp=sharing</string>
     <string name="FAQ_TEXT">Quick Tutorial</string>
+    <string name="Constraint">Constraint #</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -141,4 +142,5 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="title_activity_watch_my_constraints">Selected Constraints</string>
 </resources>
