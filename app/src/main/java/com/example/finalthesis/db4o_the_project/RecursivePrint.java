@@ -26,6 +26,7 @@ import com.db4o.reflect.ReflectClass;
 import com.db4o.reflect.ReflectField;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectClassesResultsRecyclerViewAdapter;
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsValuesRecyclerViewAdapter;
+import com.example.finalthesis.db4o_the_project.fragments.WatchMyConstraints;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
 import com.example.finalthesis.db4o_the_project.models.Db4oSubClass;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
@@ -156,6 +157,23 @@ public class RecursivePrint extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.FAQ)));
             startActivity(intent);
             return true;
+        }
+        if (id == R.id.MyConsT) {
+            List<MyConstraint> myConstraints=constraintsJsonData.getConstraints();
+            if (myConstraints.isEmpty()) {
+                Toast.makeText(RecursivePrint.this,"No Constraints", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    ConstraintsJsonData constraintsJsonData = new ConstraintsJsonData();
+                    constraintsJsonData.setConstraints(myConstraints);
+                    Intent intent = new Intent(RecursivePrint.this, WatchMyConstraints.class);
+                    intent.putExtra(getString(R.string.ConsJSOND), mapper.writeValueAsString(constraintsJsonData));
+                    startActivity(intent);
+                    return true;
+                } catch (Exception ex) {
+
+                }
+            }
         }
         return super.onOptionsItemSelected(item);
     }
