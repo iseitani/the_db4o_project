@@ -117,7 +117,7 @@ public class ConstraintDialogFragment extends DialogFragment {
                             String value;
                             switch (operatorSpinner.getSelectedItem().toString()) {
                                 case "=":
-                                case "Equals":
+                                case "(=)/Equals":
                                     operator = Constants.EQUALS_OPERATOR;
                                     break;
                                 case ">":

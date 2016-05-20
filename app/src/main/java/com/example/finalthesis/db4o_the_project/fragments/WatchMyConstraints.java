@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
+import com.example.finalthesis.db4o_the_project.Constants;
 import com.example.finalthesis.db4o_the_project.R;
 import com.example.finalthesis.db4o_the_project.models.ConstraintsJsonData;
 import com.example.finalthesis.db4o_the_project.models.MyConstraint;
@@ -67,6 +68,7 @@ public class WatchMyConstraints extends AppCompatActivity
     }
 
     private void fillList(){
+        menu.clear();
         int counter=1;
         for (MyConstraint myConstraint : myConstraints) {
            menu.add(Menu.NONE,counter,Menu.NONE,getString(R.string.Constraint)+counter);
@@ -78,16 +80,41 @@ public class WatchMyConstraints extends AppCompatActivity
     private void fillData(MyConstraint tmpCon){
         int size=tmpCon.getPath().size();
         String tmp="<html><body>";
-        for (int i=0;i<size-1;i++) {
+        for (int i=0;i<size;i++) {
             tmp += "<ul><li>"+tmpCon.getPath().get(i);
         }
-        tmp+=" = "+tmpCon.getValue();
-        for(int i1=0; i1<size-1;i1++){
+        tmp+=addOperator(tmpCon.getOperator())+tmpCon.getValue();
+        for(int i1=0; i1<size;i1++){
             tmp+="</li></ul>";
         }
         tmp+="</body></html>";
         WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
-        tmpView.loadData(tmp,"text/html",null);
+        tmpView.loadData(tmp, "text/html", null);
+    }
+
+    private String addOperator(int operator){
+        String tmpOperator=null;
+        switch (operator) {
+            case Constants.GREATER_OPERATOR:
+                tmpOperator=" > ";
+                break;
+            case Constants.SMALLER_OPERATOR:
+                tmpOperator=" < ";
+                break;
+            case Constants.LIKE_OPERATOR:
+                tmpOperator=" LIKE ";
+                break;
+            case Constants.EQUALS_OPERATOR:
+                tmpOperator=" = ";
+                break;
+            case Constants.GREATER_EQUALS_OPERATOR:
+                tmpOperator=" >= ";
+                break;
+            case Constants.SMALLER_EQUALS_OPERATOR:
+                tmpOperator=" <= ";
+                break;
+        }
+        return tmpOperator;
     }
 
     @Override
@@ -127,6 +154,7 @@ public class WatchMyConstraints extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId()-1;
+        //int id=item.getOrder();
          MyConstraint tmpCon=myConstraints.get(id);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

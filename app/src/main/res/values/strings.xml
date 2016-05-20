@@ -29,7 +29,7 @@
     <string name="FALSE">False</string>
     <string name="TRUE">True</string>
     <string name="Loading">Loading....</string>
-    <string name="Equals">Equals</string>
+    <string name="Equals">(=)/Equals</string>
     <string name="EqualsSign"> = </string>
     <string name="Date1">java.util.Date</string>
     <string name="Date2">java.sql.Date</string>
