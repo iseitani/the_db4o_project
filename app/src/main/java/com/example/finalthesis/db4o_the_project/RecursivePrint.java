@@ -171,7 +171,7 @@ public class RecursivePrint extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 } catch (Exception ex) {
-
+//
                 }
             }
         }
