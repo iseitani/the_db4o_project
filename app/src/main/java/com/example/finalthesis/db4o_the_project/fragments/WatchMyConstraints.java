@@ -115,7 +115,7 @@ public class WatchMyConstraints extends AppCompatActivity implements NavigationV
         drawer.closeDrawer(GravityCompat.START);
         WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
         tmpView.loadData(fillData(id), "text/html", null);
-        tmpView.setBackgroundColor(Color.DKGRAY);
+        tmpView.setBackgroundColor(Color.argb(1, 48, 48, 48));
         tmpView.invokeZoomPicker();
         tmpView.getSettings().setBuiltInZoomControls(true);
         tmpView.reload();
@@ -197,7 +197,7 @@ public class WatchMyConstraints extends AppCompatActivity implements NavigationV
                 "\tborder: 1px solid #ccc;\n" +
                 "\tpadding: 5px 10px;\n" +
                 "\ttext-decoration: none;\n" +
-                "\tcolor: #666;\n" +
+                "\tcolor: #ffffff;\n" +
                 "\tfont-family: arial, verdana, tahoma;\n" +
                 "\tfont-size: 11px;\n" +
                 "\tdisplay: inline-block;\n" +
