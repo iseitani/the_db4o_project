@@ -21,6 +21,7 @@ public class Db4oSubClass {
     }
 
     public void CloseDB() {
+
         getDb().close();
     }
 

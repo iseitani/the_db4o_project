@@ -30,7 +30,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-       <!-- -->
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -71,7 +70,7 @@
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
-<!-- -->
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

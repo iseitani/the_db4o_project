@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.finalthesis.db4o_the_project.adapters.ReflectFieldsListViewAdapter;
@@ -49,7 +48,7 @@ public class Initial extends AppCompatActivity
                 x.putExtra("className", kClass);
                 startActivity(x);
             }
-        });//13
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

@@ -1,5 +1,6 @@
 package com.example.finalthesis.db4o_the_project.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -114,6 +115,7 @@ public class WatchMyConstraints extends AppCompatActivity implements NavigationV
         drawer.closeDrawer(GravityCompat.START);
         WebView tmpView=(WebView)findViewById(R.id.constraintsViewer);
         tmpView.loadData(fillData(id), "text/html", null);
+        tmpView.setBackgroundColor(Color.DKGRAY);
         tmpView.invokeZoomPicker();
         tmpView.getSettings().setBuiltInZoomControls(true);
         tmpView.reload();
